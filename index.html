@@ -218,7 +218,6 @@
 
     <!-- ═══ RAINBOW BACKGROUND ═══ -->
     <div class="rainbow-bg" id="rainbowBg">
-        <!-- 25 .rainbow divs will be injected by JS -->
         <div class="h"></div>
         <div class="v"></div>
     </div>
@@ -263,12 +262,19 @@
                 <span class="badge">from DLX lmao</span>
             </a>
 
-            <!-- ═══ NEW CARD: PLACEMENT LOOKUP ═══ -->
             <a href="placement-lookup.html" class="card">
                 <span class="icon">👀</span>
                 <h3>Placement</h3>
                 <div class="desc">Find BANK and PLACEMENT from CH CODE using the uploaded Excel file.</div>
                 <span class="badge">extract data</span>
+            </a>
+
+            <!-- ═══ NEW CARD: FOR PASSES ═══ -->
+            <a href="for-passes.html" class="card">
+                <span class="icon">🔝</span>
+                <h3>For Passes</h3>
+                <div class="desc">Extract data from RESULT sheet, filter by BANK = "PIF HOME LOAN", split CANCEL rows, and create a UNIQ sheet.</div>
+                <span class="badge">excel processor</span>
             </a>
 
         </div>
@@ -288,12 +294,10 @@
             const length = 25;
             const animationTime = 45;
 
-            // Color palettes (matching SCSS)
             const purple = 'rgb(232 121 249)';
             const blue = 'rgb(96 165 250)';
             const green = 'rgb(94 234 212)';
 
-            // All 6 permutations
             const perms = [
                 [purple, blue, green],
                 [purple, green, blue],
@@ -306,30 +310,18 @@
             for (let i = 1; i <= length; i++) {
                 const el = document.createElement('div');
                 el.className = 'rainbow';
-
-                // pick random permutation
                 const perm = perms[Math.floor(Math.random() * perms.length)];
-
-                // box-shadow: white, color1, color2, color3, white
                 const shadow =
                     `-130px 0 80px 40px white, ` +
                     `-50px 0 50px 25px ${perm[0]}, ` +
                     `0 0 50px 25px ${perm[1]}, ` +
                     `50px 0 50px 25px ${perm[2]}, ` +
                     `130px 0 80px 40px white`;
-
                 el.style.boxShadow = shadow;
-
-                // duration: 45s - 45/25/2 * i  =  45 - 0.9*i
                 const duration = animationTime - (animationTime / length / 2) * i;
-                // delay: -i / length * 45s
                 const delay = -(i / length) * animationTime;
-
-                el.style.animation =
-                    `${duration}s linear infinite slide`;
+                el.style.animation = `${duration}s linear infinite slide`;
                 el.style.animationDelay = `${delay}s`;
-
-                // insert before .h (which is the last child)
                 container.insertBefore(el, container.querySelector('.h'));
             }
         })();
