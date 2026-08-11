@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PIF NEW ENDO Mapper</title>
+    <!-- 📆 Favicon for the browser tab -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📆</text></svg>" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, "SF Pro", "Segoe UI", Roboto, sans-serif;
+            background: #f0ebe5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ── rainbow background layer ── */
+        .rainbow-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            background: #f0ebe5;
+        }
+        .rainbow {
+            height: 100vh;
+            width: 0;
+            top: 0;
+            position: absolute;
+            transform: rotate(10deg);
+            transform-origin: top right;
+            will-change: right;
+        }
+        .h {
+            box-shadow: 0 0 50vh 40vh rgba(255, 255, 255, 0.85);
+            width: 100vw;
+            height: 0;
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        .v {
+            box-shadow: 0 0 35vw 25vw rgba(255, 255, 255, 0.80);
+            width: 0;
+            height: 100vh;
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        @keyframes slide {
+            from { right: -25vw; }
+            to { right: 125vw; }
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 28px;
+            padding: 30px 35px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card * {
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+        }
+
+        .back-row {
+            margin-bottom: 18px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(129, 166, 198, 0.85);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            backdrop-filter: blur(4px);
+        }
+        .back-btn:hover {
+            background: #6a8fb0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(129, 166, 198, 0.3);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 600;
+            color: #1e2f3a;
+            margin: 0 0 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sub {
+            color: #2c3e50;
+            font-size: 14px;
+            margin-top: -2px;
+            margin-bottom: 22px;
+            padding-left: 14px;
+            border-left: 4px solid rgba(129, 166, 198, 0.7);
+        }
+
+        .drop-zone {
+            border: 3px dashed rgba(210, 196, 180, 0.5);
+            border-radius: 20px;
+            padding: 48px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.4);
+            transition: background 0.2s, border-color 0.2s;
+            cursor: pointer;
+            position: relative;
+            backdrop-filter: blur(4px);
+        }
+        .drop-zone.dragover {
+            background: rgba(129, 166, 198, 0.15);
+            border-color: #81A6C6;
+        }
+        .drop-zone .icon {
+            font-size: 52px;
+            margin-bottom: 10px;
+        }
+        .drop-zone p {
+            color: #1e2f3a;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .drop-zone .hint {
+            color: #3a4f5f;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .status {
+            margin-top: 18px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            display: none;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        .status.success {
+            display: block;
+            background: rgba(220, 252, 231, 0.8);
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .status.error {
+            display: block;
+            background: rgba(254, 226, 226, 0.8);
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .status.info {
+            display: block;
+            background: rgba(219, 234, 254, 0.8);
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .preview-area {
+            margin-top: 22px;
+            max-height: 340px;
+            overflow: auto;
+            border: 1px solid rgba(210, 196, 180, 0.3);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(4px);
+            display: none;
+        }
+        .preview-area table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .preview-area th {
+            background: rgba(243, 227, 208, 0.7);
+            color: #1e2f3a;
+            padding: 8px 6px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .preview-area td {
+            padding: 6px;
+            border-bottom: 1px solid rgba(210, 196, 180, 0.3);
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #1e2f3a;
+        }
+        .preview-area tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn {
+            background: rgba(129, 166, 198, 0.85);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+            backdrop-filter: blur(4px);
+        }
+        .btn:hover {
+            background: #6a8fb0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(129, 166, 198, 0.25);
+        }
+        .btn.primary {
+            background: rgba(129, 166, 198, 0.85);
+        }
+        .btn.primary:hover {
+            background: #6a8fb0;
+        }
+        .btn.secondary {
+            background: rgba(170, 205, 220, 0.7);
+            color: #1e2f3a;
+        }
+        .btn.secondary:hover {
+            background: #81A6C6;
+            color: #fff;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .stats {
+            margin-left: auto;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #2c3e50;
+            text-align: center;
+            border-top: 1px solid rgba(210, 196, 180, 0.3);
+            padding-top: 18px;
+        }
+        .footer .highlight {
+            color: #81A6C6;
+            font-weight: 600;
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .stats {
+                margin-left: 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ RAINBOW BACKGROUND ═══ -->
+    <div class="rainbow-bg" id="rainbowBg">
+        <div class="h"></div>
+        <div class="v"></div>
+    </div>
+
+    <!-- ═══ MAIN CARD ═══ -->
+    <div class="card">
+        <!-- Back to Dashboard button -->
+        <div class="back-row">
+            <a href="index.html" class="back-btn">← Back to Dashboard</a>
+        </div>
+
+        <h1>📆 PIF NEW ENDO Mapper</h1>
+        <div class="sub">Generate SUMMARY PIF HOMELOAN NEW ENDO from your PIF Excel file.</div>
+
+        <div class="drop-zone" id="dropZone">
+            <div class="icon">📂</div>
+            <p>Drop your Excel file here</p>
+            <div class="hint">or click to browse (.xlsx, .xls)</div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls" />
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="preview-area" id="previewArea">
+            <table id="previewTable">
+                <thead id="previewHead"></thead>
+                <tbody id="previewBody"></tbody>
+            </table>
+        </div>
+
+        <div class="actions">
+            <button class="btn primary" id="downloadBtn" disabled>
+                ⬇️ Download SUMMARY.xlsx
+            </button>
+            <button class="btn secondary" id="resetBtn" disabled>
+                🔄 Clear / Reset
+            </button>
+            <span class="stats" id="stats">No data loaded</span>
+        </div>
+
+        <div class="footer">
+            <div>📆 Output tab: <strong>New Endo Mapper</strong></div>
+            <div style="margin-top:4px; font-size:12px; color:#5a6f7f;">
+                <span class="highlight">Font 9</span> · <span class="highlight">Bold</span> · 
+                <span class="highlight">Center</span> · <span class="highlight">Borders</span> · 
+                <span class="highlight">Header only</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ── rainbow generator ──
+            (function() {
+                const container = document.getElementById('rainbowBg');
+                const length = 25;
+                const animationTime = 45;
+                const purple = 'rgb(232 121 249)';
+                const blue = 'rgb(96 165 250)';
+                const green = 'rgb(94 234 212)';
+                const perms = [
+                    [purple, blue, green],
+                    [purple, green, blue],
+                    [green, purple, blue],
+                    [green, blue, purple],
+                    [blue, green, purple],
+                    [blue, purple, green]
+                ];
+                for (let i = 1; i <= length; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'rainbow';
+                    const perm = perms[Math.floor(Math.random() * perms.length)];
+                    const shadow =
+                        `-160px 0 100px 50px white, ` +
+                        `-80px 0 80px 40px ${perm[0]}, ` +
+                        `0 0 80px 40px ${perm[1]}, ` +
+                        `80px 0 80px 40px ${perm[2]}, ` +
+                        `160px 0 100px 50px white`;
+                    el.style.boxShadow = shadow;
+                    const duration = animationTime - (animationTime / length / 2) * i;
+                    const delay = -(i / length) * animationTime;
+                    el.style.animation = `${duration}s linear infinite slide`;
+                    el.style.animationDelay = `${delay}s`;
+                    container.insertBefore(el, container.querySelector('.h'));
+                }
+            })();
+
+            // DOM refs
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const statusEl = document.getElementById('status');
+            const previewArea = document.getElementById('previewArea');
+            const previewHead = document.getElementById('previewHead');
+            const previewBody = document.getElementById('previewBody');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const statsEl = document.getElementById('stats');
+
+            let parsedData = [];
+            let sourceFileName = '';
+
+            // ----- Library checks -----
+            if (typeof XLSX === 'undefined') {
+                setStatus('❌ SheetJS library failed to load. Please check your internet connection.', 'error');
+                console.error('XLSX is not defined.');
+            }
+            if (typeof ExcelJS === 'undefined') {
+                setStatus('❌ ExcelJS library failed to load. Please check your internet connection.', 'error');
+                console.error('ExcelJS is not defined.');
+            }
+
+            function setStatus(msg, type = 'info') {
+                statusEl.textContent = msg;
+                statusEl.className = 'status ' + type;
+                console.log('[STATUS]', type, msg);
+            }
+
+            // ----- Reset everything -----
+            function resetAll() {
+                parsedData = [];
+                sourceFileName = '';
+                previewArea.style.display = 'none';
+                previewHead.innerHTML = '';
+                previewBody.innerHTML = '';
+                statsEl.textContent = 'No data loaded';
+                downloadBtn.disabled = true;
+                resetBtn.disabled = true;
+                fileInput.value = '';
+                setStatus('📂 Drop your PIF Excel file here, or click to browse.', 'info');
+            }
+
+            // ----- Get today in MM/DD/YYYY -----
+            function getTodayMMDDYYYY() {
+                const now = new Date();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const year = now.getFullYear();
+                return `${month}/${day}/${year}`;
+            }
+
+            // ----- Get today in MM-DD-YYYY for file name -----
+            function getTodayMMDDYYYYDash() {
+                const now = new Date();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const year = now.getFullYear();
+                return `${month}-${day}-${year}`;
+            }
+
+            // ----- Format date to MM/DD/YYYY (for preview) -----
+            function formatToMMDDYYYY(val) {
+                if (!val) return '';
+                let d = null;
+                if (typeof val === 'number') {
+                    d = new Date((val - 25569) * 86400 * 1000);
+                } else if (typeof val === 'string') {
+                    d = new Date(val);
+                } else if (val instanceof Date) {
+                    d = val;
+                }
+                if (d && !isNaN(d)) {
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const year = d.getFullYear();
+                    return `${month}/${day}/${year}`;
+                }
+                return val ? val.toString() : '';
+            }
+
+            // ----- Parse a date value into a Date object -----
+            function parseDateValue(val) {
+                if (!val) return null;
+                if (val instanceof Date && !isNaN(val)) return val;
+                if (typeof val === 'number') {
+                    const d = new Date((val - 25569) * 86400 * 1000);
+                    return !isNaN(d) ? d : null;
+                }
+                if (typeof val === 'string') {
+                    const d = new Date(val);
+                    return !isNaN(d) ? d : null;
+                }
+                return null;
+            }
+
+            // ----- Map ACCOUNT_TYPE → DL TYPE -----
+            function getDlType(accountType) {
+                const at = (accountType || '').trim().toUpperCase();
+                if (at === 'FRESH' || at === 'REFRESH' || at === 'CONTINUOUS') {
+                    return 'DL1';
+                }
+                if (at === 'CYCLE 3 CTS' || at === 'CYCLE 3 REM') {
+                    return 'DL4';
+                }
+                return '';
+            }
+
+            // ----- Transform source data to SUMMARY rows -----
+            function transformToSummary(rows, headers) {
+                function findCol(label) {
+                    for (let i = 0; i < headers.length; i++) {
+                        if (headers[i] && headers[i].trim().toUpperCase() === label.toUpperCase()) {
+                            return i;
+                        }
+                    }
+                    return -1;
+                }
+
+                const idx = {
+                    chCode: findCol('CH CODE'),
+                    hlidNo: findCol('HlidNo'),
+                    name: findCol('LastName, FirstName MidName'),
+                    primaryAddr: findCol('Primary Address'),
+                    secondaryAddr: findCol('Secondary Address'),
+                    branch: findCol('Branch'),
+                    priCity: findCol('PRI CITY/MUNI'),
+                    priBrgy: findCol('PRI BRGY'),
+                    secCity: findCol('SEC CITY/MUNI'),
+                    secBrgy: findCol('SEC BRGY'),
+                    reffCode: findCol('REFF CODE'),
+                    pulloutDate: findCol('PULLOUT DATE'),
+                    outbal: findCol('Outbal'),
+                    amountDue: findCol('AmountDue'),
+                    endorseDate: findCol('EndorseDate'),
+                    accountType: findCol('ACCOUNT_TYPE'),
+                };
+
+                const FALLBACK = {
+                    chCode: 0,
+                    hlidNo: 2,
+                    name: 3,
+                    primaryAddr: 9,
+                    secondaryAddr: 11,
+                    branch: 28,
+                    priCity: 33,
+                    priBrgy: 35,
+                    secCity: 34,
+                    secBrgy: 36,
+                    reffCode: 31,
+                    pulloutDate: 25,
+                    outbal: 19,
+                    amountDue: 18,
+                    endorseDate: 17,
+                    accountType: 32,
+                };
+                for (const key in FALLBACK) {
+                    if (idx[key] === -1) idx[key] = FALLBACK[key];
+                }
+
+                // Collect source rows (skip empty CH CODE)
+                const sourceRows = [];
+                for (let r = 0; r < rows.length; r++) {
+                    const row = rows[r];
+                    const chCode = (row[idx.chCode] || '').toString().trim();
+                    if (!chCode) continue;
+                    sourceRows.push(row);
+                }
+
+                if (sourceRows.length === 0) {
+                    throw new Error('No data rows found in the source file.');
+                }
+
+                function getStr(row, colIdx) {
+                    if (colIdx === -1 || colIdx >= row.length) return '';
+                    const v = row[colIdx];
+                    if (v === null || v === undefined) return '';
+                    return v.toString().trim();
+                }
+
+                function getNum(row, colIdx) {
+                    if (colIdx === -1 || colIdx >= row.length) return '';
+                    const v = row[colIdx];
+                    if (v === null || v === undefined) return '';
+                    if (typeof v === 'number') return v;
+                    const str = v.toString().trim().replace(/,/g, '');
+                    const num = parseFloat(str);
+                    return isNaN(num) ? '' : num;
+                }
+
+                const todayStr = getTodayMMDDYYYY();
+                const output = [];
+
+                // ---- PRIMARY rows ----
+                for (const row of sourceRows) {
+                    const chCode = getStr(row, idx.chCode);
+                    const hlidNo = getStr(row, idx.hlidNo);
+                    const name = getStr(row, idx.name);
+                    const branch = getStr(row, idx.branch);
+                    const priCity = getStr(row, idx.priCity);
+                    const priBrgy = getStr(row, idx.priBrgy);
+                    const reffCode = getStr(row, idx.reffCode);
+                    const outbal = getNum(row, idx.outbal);
+                    const amountDue = getNum(row, idx.amountDue);
+                    const accountType = getStr(row, idx.accountType);
+                    const primaryAddr = getStr(row, idx.primaryAddr);
+                    const endorseRaw = row[idx.endorseDate];
+                    const pulloutRaw = row[idx.pulloutDate];
+                    const endorseDisplay = formatToMMDDYYYY(endorseRaw);
+                    const pulloutDisplay = formatToMMDDYYYY(pulloutRaw);
+                    const dlType = getDlType(accountType);
+                    const addType = 'primary address';
+
+                    output.push({
+                        'uniq': chCode + addType,
+                        'ACCOUNT NUMBER': hlidNo,
+                        'BANK': 'PIF HOME LOAN',
+                        'PLACEMENT': branch,
+                        'CH CODE': chCode,
+                        'CH NAME': name,
+                        'ADD TYPE': addType,
+                        'ADDRESS': primaryAddr,
+                        'AREA': '',
+                        'MUNICIPALITY': priCity,
+                        'BRGY': priBrgy,
+                        'FINAL AREA': '',
+                        'DL TYPE': dlType,
+                        'REFERENCE CODE': reffCode,
+                        'AUTOFIELD DATE': todayStr,
+                        'OB/PRINCIPAL': outbal,
+                        'AMOUNT DUE': amountDue,
+                        'ENDO DATE': endorseDisplay,
+                        'ACCOUNT TYPE': accountType,
+                        'REMARKS': 'NEW ENDO',
+                        'POUT DATE': pulloutDisplay,
+                        '_endorseRaw': endorseRaw,
+                        '_pulloutRaw': pulloutRaw,
+                    });
+                }
+
+                // ---- SECONDARY rows ----
+                for (const row of sourceRows) {
+                    const chCode = getStr(row, idx.chCode);
+                    const hlidNo = getStr(row, idx.hlidNo);
+                    const name = getStr(row, idx.name);
+                    const branch = getStr(row, idx.branch);
+                    const secCity = getStr(row, idx.secCity);
+                    const secBrgy = getStr(row, idx.secBrgy);
+                    const reffCode = getStr(row, idx.reffCode);
+                    const outbal = getNum(row, idx.outbal);
+                    const amountDue = getNum(row, idx.amountDue);
+                    const accountType = getStr(row, idx.accountType);
+                    const secondaryAddr = getStr(row, idx.secondaryAddr);
+                    const endorseRaw = row[idx.endorseDate];
+                    const pulloutRaw = row[idx.pulloutDate];
+                    const endorseDisplay = formatToMMDDYYYY(endorseRaw);
+                    const pulloutDisplay = formatToMMDDYYYY(pulloutRaw);
+                    const dlType = getDlType(accountType);
+                    const addType = 'secondary address';
+
+                    output.push({
+                        'uniq': chCode + addType,
+                        'ACCOUNT NUMBER': hlidNo,
+                        'BANK': 'PIF HOME LOAN',
+                        'PLACEMENT': branch,
+                        'CH CODE': chCode,
+                        'CH NAME': name,
+                        'ADD TYPE': addType,
+                        'ADDRESS': secondaryAddr,
+                        'AREA': '',
+                        'MUNICIPALITY': secCity,
+                        'BRGY': secBrgy,
+                        'FINAL AREA': '',
+                        'DL TYPE': dlType,
+                        'REFERENCE CODE': reffCode,
+                        'AUTOFIELD DATE': todayStr,
+                        'OB/PRINCIPAL': outbal,
+                        'AMOUNT DUE': amountDue,
+                        'ENDO DATE': endorseDisplay,
+                        'ACCOUNT TYPE': accountType,
+                        'REMARKS': 'NEW ENDO',
+                        'POUT DATE': pulloutDisplay,
+                        '_endorseRaw': endorseRaw,
+                        '_pulloutRaw': pulloutRaw,
+                    });
+                }
+
+                return output;
+            }
+
+            // ----- Render preview (first 15 rows) -----
+            function renderPreview(data) {
+                if (!data || data.length === 0) {
+                    previewArea.style.display = 'none';
+                    return;
+                }
+                previewArea.style.display = 'block';
+
+                const displayKeys = Object.keys(data[0]).filter(k => !k.startsWith('_'));
+                previewHead.innerHTML = '<tr>' + displayKeys.map(h => `<th>${h}</th>`).join('') + '</tr>';
+
+                const slice = data.slice(0, 15);
+                previewBody.innerHTML = slice.map(row => {
+                    return '<tr>' + displayKeys.map(h => {
+                        let val = row[h];
+                        if (typeof val === 'number' && val !== 0) val = val.toFixed(2);
+                        else if (val === '' || val === null || val === undefined) val = '';
+                        return `<td>${val}</td>`;
+                    }).join('') + '</tr>';
+                }).join('');
+
+                statsEl.textContent = `✅ ${data.length} rows generated (${data.length / 2} source records)`;
+                downloadBtn.disabled = false;
+                resetBtn.disabled = false;
+            }
+
+            // ----- Download using ExcelJS – header row gets styling, data gets font size 9 -----
+            function downloadSummary(data, originalFileName) {
+                if (!data || data.length === 0) {
+                    setStatus('No data to download.', 'error');
+                    return;
+                }
+
+                if (typeof ExcelJS === 'undefined') {
+                    setStatus('❌ ExcelJS library not loaded. Cannot format Excel file.', 'error');
+                    return;
+                }
+
+                try {
+                    const workbook = new ExcelJS.Workbook();
+                    const worksheet = workbook.addWorksheet('📆 New Endo Mapper');
+
+                    // Define columns with headers and widths
+                    const columnDefs = [
+                        { header: 'uniq', key: 'uniq', width: 25 },
+                        { header: 'ACCOUNT NUMBER', key: 'ACCOUNT NUMBER', width: 18 },
+                        { header: 'BANK', key: 'BANK', width: 15 },
+                        { header: 'PLACEMENT', key: 'PLACEMENT', width: 15 },
+                        { header: 'CH CODE', key: 'CH CODE', width: 15 },
+                        { header: 'CH NAME', key: 'CH NAME', width: 25 },
+                        { header: 'ADD TYPE', key: 'ADD TYPE', width: 18 },
+                        { header: 'ADDRESS', key: 'ADDRESS', width: 40 },
+                        { header: 'AREA', key: 'AREA', width: 15 },
+                        { header: 'MUNICIPALITY', key: 'MUNICIPALITY', width: 20 },
+                        { header: 'BRGY', key: 'BRGY', width: 20 },
+                        { header: 'FINAL AREA', key: 'FINAL AREA', width: 20 },
+                        { header: 'DL TYPE', key: 'DL TYPE', width: 10 },
+                        { header: 'REFERENCE CODE', key: 'REFERENCE CODE', width: 15 },
+                        { header: 'AUTOFIELD DATE', key: 'AUTOFIELD DATE', width: 15 },
+                        { header: 'OB/PRINCIPAL', key: 'OB/PRINCIPAL', width: 18 },
+                        { header: 'AMOUNT DUE', key: 'AMOUNT DUE', width: 18 },
+                        { header: 'ENDO DATE', key: 'ENDO DATE', width: 15 },
+                        { header: 'ACCOUNT TYPE', key: 'ACCOUNT TYPE', width: 18 },
+                        { header: 'REMARKS', key: 'REMARKS', width: 15 },
+                        { header: 'POUT DATE', key: 'POUT DATE', width: 15 },
+                    ];
+
+                    worksheet.columns = columnDefs;
+
+                    // ----- Write header row (row 1) with styles -----
+                    const headerRow = worksheet.getRow(1);
+                    columnDefs.forEach((col, idx) => {
+                        const cell = headerRow.getCell(idx + 1);
+                        cell.value = col.header;
+                        // Apply header style: font 9, bold, center, thin borders
+                        cell.font = { size: 9, bold: true, name: 'Calibri' };
+                        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' },
+                        };
+                    });
+
+                    // ----- Write data rows (font size 9, plain, but with number/date formats) -----
+                    const dateColumns = ['AUTOFIELD DATE', 'ENDO DATE', 'POUT DATE'];
+                    const numberColumns = ['OB/PRINCIPAL', 'AMOUNT DUE'];
+
+                    data.forEach((row, rowIndex) => {
+                        const excelRow = worksheet.getRow(rowIndex + 2);
+                        columnDefs.forEach((col, colIndex) => {
+                            const key = col.key;
+                            const cell = excelRow.getCell(colIndex + 1);
+                            let value = row[key];
+
+                            // Handle date columns
+                            if (dateColumns.includes(key)) {
+                                if (key === 'AUTOFIELD DATE') {
+                                    const now = new Date();
+                                    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                    cell.value = d;
+                                    cell.numFmt = 'mm/dd/yyyy';
+                                } else {
+                                    let rawKey = (key === 'ENDO DATE') ? '_endorseRaw' : '_pulloutRaw';
+                                    let rawVal = row[rawKey];
+                                    let dateObj = parseDateValue(rawVal);
+                                    if (dateObj) {
+                                        cell.value = dateObj;
+                                        cell.numFmt = 'mm/dd/yyyy';
+                                    } else {
+                                        let fallback = parseDateValue(row[key]);
+                                        if (fallback) {
+                                            cell.value = fallback;
+                                            cell.numFmt = 'mm/dd/yyyy';
+                                        } else {
+                                            cell.value = row[key] || '';
+                                        }
+                                    }
+                                }
+                            }
+                            // Handle number columns
+                            else if (numberColumns.includes(key)) {
+                                if (typeof value === 'number' && !isNaN(value)) {
+                                    cell.value = value;
+                                    cell.numFmt = '#,##0.00';
+                                } else {
+                                    cell.value = value || '';
+                                }
+                            }
+                            // All other columns
+                            else {
+                                cell.value = value || '';
+                            }
+
+                            // Apply font size 9 to all data cells
+                            cell.font = { size: 9, name: 'Calibri' };
+                        });
+                    });
+
+                    // ----- Generate and download with custom file name -----
+                    const todayStr = getTodayMMDDYYYYDash();
+                    const fileName = `SUMMARY PIF HOMELOAN NEW ENDO ${todayStr}.xlsx`;
+
+                    workbook.xlsx.writeBuffer().then(buffer => {
+                        const blob = new Blob([buffer], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+                        setStatus(`✅ File "${fileName}" downloaded successfully!`, 'success');
+                    }).catch(err => {
+                        console.error(err);
+                        setStatus(`❌ Error generating Excel: ${err.message}`, 'error');
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                    setStatus(`❌ Error: ${err.message}`, 'error');
+                }
+            }
+
+            // ----- Process uploaded file -----
+            function processFile(file) {
+                if (!file) {
+                    setStatus('❌ No file selected.', 'error');
+                    return;
+                }
+
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (ext !== 'xlsx' && ext !== 'xls') {
+                    setStatus(`❌ File "${file.name}" is not an Excel file (.xlsx or .xls).`, 'error');
+                    return;
+                }
+
+                if (typeof XLSX === 'undefined') {
+                    setStatus('❌ SheetJS library not loaded. Please check your internet connection and refresh.', 'error');
+                    return;
+                }
+
+                setStatus('📖 Reading file...', 'info');
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+
+                        if (!json || json.length < 2) {
+                            setStatus('❌ File appears empty or has no data rows.', 'error');
+                            return;
+                        }
+
+                        const headers = json[0];
+                        const rows = json.slice(1);
+
+                        const outputData = transformToSummary(rows, headers);
+                        parsedData = outputData;
+                        sourceFileName = file.name;
+
+                        renderPreview(outputData);
+                        setStatus(`✅ Success! ${outputData.length} rows mapped.`, 'success');
+                        downloadBtn.disabled = false;
+                        resetBtn.disabled = false;
+
+                    } catch (err) {
+                        console.error(err);
+                        setStatus(`❌ Error: ${err.message}`, 'error');
+                    }
+                };
+                reader.onerror = function() {
+                    setStatus('❌ Failed to read file.', 'error');
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            // ----- Event Listeners -----
+            document.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+            document.addEventListener('drop', function(e) {
+                e.preventDefault();
+            });
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processFile(files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    processFile(files[0]);
+                }
+                fileInput.value = '';
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (parsedData.length > 0) {
+                    downloadSummary(parsedData, sourceFileName);
+                } else {
+                    setStatus('❌ No data to download. Please load a file first.', 'error');
+                }
+            });
+
+            // Reset button handler
+            resetBtn.addEventListener('click', resetAll);
+
+            // Initial status
+            setStatus('📂 Drop your PIF Excel file here, or click to browse.', 'info');
+            resetBtn.disabled = true;
+
+            // Library checks
+            if (typeof XLSX !== 'undefined') console.log('✅ SheetJS loaded.');
+            if (typeof ExcelJS !== 'undefined') console.log('✅ ExcelJS loaded.');
+        })();
+    </script>
+
+</body>
+</html>
