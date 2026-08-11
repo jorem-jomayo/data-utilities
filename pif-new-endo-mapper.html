@@ -286,19 +286,6 @@
             font-size: 14px;
         }
 
-        .footer {
-            margin-top: 20px;
-            font-size: 13px;
-            color: #2c3e50;
-            text-align: center;
-            border-top: 1px solid rgba(210, 196, 180, 0.3);
-            padding-top: 18px;
-        }
-        .footer .highlight {
-            color: #81A6C6;
-            font-weight: 600;
-        }
-
         @media (max-width: 640px) {
             .card {
                 padding: 20px;
@@ -359,15 +346,6 @@
                 🔄 Clear / Reset
             </button>
             <span class="stats" id="stats">No data loaded</span>
-        </div>
-
-        <div class="footer">
-            <div>📆 Output tab: <strong>New Endo Mapper</strong></div>
-            <div style="margin-top:4px; font-size:12px; color:#5a6f7f;">
-                <span class="highlight">Font 9</span> · <span class="highlight">Bold</span> · 
-                <span class="highlight">Center</span> · <span class="highlight">Borders</span> · 
-                <span class="highlight">Header only</span>
-            </div>
         </div>
     </div>
 
@@ -741,7 +719,8 @@
 
                 try {
                     const workbook = new ExcelJS.Workbook();
-                    const worksheet = workbook.addWorksheet('📆 New Endo Mapper');
+                    // Sheet name changed to "SUMMARY"
+                    const worksheet = workbook.addWorksheet('SUMMARY');
 
                     // Define columns with headers and widths
                     const columnDefs = [
