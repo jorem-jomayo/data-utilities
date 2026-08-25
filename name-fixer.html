@@ -5,328 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Name Fixer</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✏️</text></svg>" />
+    <!-- SheetJS for reading Excel files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* ── rainbow background layer ── */
-        .rainbow-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-            background: #f0ebe5;
-        }
-        .rainbow {
-            height: 100vh;
-            width: 0;
-            top: 0;
-            position: absolute;
-            transform: rotate(10deg);
-            transform-origin: top right;
-            will-change: right;
-        }
-        .h {
-            box-shadow: 0 0 50vh 40vh rgba(255, 255, 255, 0.85);
-            width: 100vw;
-            height: 0;
-            bottom: 0;
-            left: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-        .v {
-            box-shadow: 0 0 35vw 25vw rgba(255, 255, 255, 0.80);
-            width: 0;
-            height: 100vh;
-            bottom: 0;
-            left: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-        @keyframes slide {
-            from { right: -25vw; }
-            to { right: 125vw; }
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1.5rem;
-            background: #f0ebe5;
-            overflow: hidden;
-            position: relative;
-            font-family: -apple-system, "SF Pro", "Segoe UI", Roboto, sans-serif;
-        }
-
-        .app-wrapper {
-            position: relative;
-            z-index: 1;
-            max-width: 680px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.35);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border-radius: 1.5rem;
-            padding: 2rem 2rem 2.5rem;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .app-wrapper * {
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
-        }
-
-        .back-row {
-            margin-bottom: 1.2rem;
-        }
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(129, 166, 198, 0.85);
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-            backdrop-filter: blur(4px);
-        }
-        .back-btn:hover {
-            background: #6a8fb0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(129, 166, 198, 0.3);
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1e2f3a;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(210, 196, 180, 0.4);
-            padding-bottom: 1rem;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 1rem 1.2rem;
-            font-size: 0.95rem;
-            font-family: inherit;
-            border: 1px solid rgba(210, 196, 180, 0.5);
-            border-radius: 1rem;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(4px);
-            color: #1e2f3a;
-            resize: vertical;
-            min-height: 150px;
-            line-height: 1.7;
-            transition: border-color 0.2s;
-            outline: none;
-        }
-        textarea:focus {
-            border-color: #81A6C6;
-            box-shadow: 0 0 0 3px rgba(129, 166, 198, 0.1);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 0.6rem;
-            margin: 1rem 0 1.8rem 0;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .btn {
-            font-weight: 500;
-            font-size: 0.85rem;
-            padding: 0.5rem 1.6rem;
-            border: none;
-            border-radius: 40px;
-            background: rgba(129, 166, 198, 0.85);
-            color: #fff;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
-            font-family: inherit;
-            backdrop-filter: blur(4px);
-        }
-        .btn:hover {
-            background: #6a8fb0;
-            transform: translateY(-2px);
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-outline {
-            background: rgba(255, 255, 255, 0.6);
-            color: #1e2f3a;
-            box-shadow: inset 0 0 0 1px rgba(210, 196, 180, 0.4);
-        }
-        .btn-outline:hover {
-            background: rgba(243, 227, 208, 0.7);
-            box-shadow: none;
-        }
-
-        #status {
-            font-size: 0.8rem;
-            color: #2c3e50;
-            margin-left: 0.3rem;
-        }
-
-        .output-label {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #2c3e50;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            margin-bottom: 0.6rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        .output-label .badge {
-            background: rgba(243, 227, 208, 0.7);
-            font-size: 0.6rem;
-            padding: 0.15rem 0.7rem;
-            border-radius: 20px;
-            color: #1e2f3a;
-            font-weight: 400;
-            letter-spacing: 0;
-            text-transform: none;
-        }
-        .output-actions {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .output-actions .btn-sm {
-            font-size: 0.7rem;
-            padding: 0.25rem 1rem;
-            border-radius: 30px;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            transition: background 0.15s;
-            background: rgba(170, 205, 220, 0.7);
-            color: #1e2f3a;
-            font-family: inherit;
-        }
-        .output-actions .btn-sm:hover {
-            background: #81A6C6;
-            color: #fff;
-        }
-        .output-actions .btn-sm.copy-success {
-            background: #81A6C6;
-            color: #fff;
-        }
-
-        .result-container {
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border-radius: 1rem;
-            padding: 1.2rem 1.5rem;
-            border: 1px solid rgba(210, 196, 180, 0.3);
-            min-height: 80px;
-        }
-        .result-line {
-            font-size: 1.2rem;
-            font-weight: 700;
-            line-height: 1.8;
-            letter-spacing: 0.02em;
-            padding: 0.1rem 0;
-            color: #1e2f3a;
-        }
-        .name-last { color: #1e2f3a; }
-        .name-first { color: #2c3e50; }
-        .empty-state {
-            color: #3a4f5f;
-            font-weight: 400;
-            font-size: 0.95rem;
-            font-style: italic;
-        }
-
-        @media (max-width: 500px) {
-            .app-wrapper { padding: 1.2rem; }
-            .result-container { padding: 0.8rem 1rem; }
-            .result-line { font-size: 1rem; }
-            textarea { font-size: 0.85rem; min-height: 120px; }
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        .rainbow-bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:#f0ebe5; }
+        .rainbow { height:100vh; width:0; top:0; position:absolute; transform:rotate(10deg); transform-origin:top right; will-change:right; }
+        .h { box-shadow:0 0 50vh 40vh rgba(255,255,255,0.85); width:100vw; height:0; bottom:0; left:0; position:absolute; pointer-events:none; }
+        .v { box-shadow:0 0 35vw 25vw rgba(255,255,255,0.80); width:0; height:100vh; bottom:0; left:0; position:absolute; pointer-events:none; }
+        @keyframes slide { from { right:-25vw; } to { right:125vw; } }
+        body { min-height:100vh; display:flex; justify-content:center; align-items:center; padding:2rem 1.5rem; background:#f0ebe5; overflow:hidden; position:relative; font-family:-apple-system,"SF Pro","Segoe UI",Roboto,sans-serif; }
+        .app-wrapper { position:relative; z-index:1; max-width:680px; width:100%; background:rgba(255,255,255,0.35); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border-radius:1.5rem; padding:2rem 2rem 2.5rem; box-shadow:0 12px 40px rgba(0,0,0,0.10), 0 0 0 1px rgba(255,255,255,0.6); border:1px solid rgba(255,255,255,0.5); }
+        .app-wrapper * { text-shadow:0 0 12px rgba(255,255,255,0.7); }
+        .back-row { margin-bottom:1.2rem; }
+        .back-btn { display:inline-flex; align-items:center; gap:8px; background:rgba(129,166,198,0.85); color:#fff; padding:8px 20px; border-radius:40px; font-weight:500; font-size:0.85rem; text-decoration:none; transition:all .2s; border:none; cursor:pointer; font-family:inherit; backdrop-filter:blur(4px); }
+        .back-btn:hover { background:#6a8fb0; transform:translateY(-2px); box-shadow:0 4px 12px rgba(129,166,198,0.3); }
+        h1 { font-size:1.5rem; font-weight:600; color:#1e2f3a; margin-bottom:1.5rem; border-bottom:1px solid rgba(210,196,180,0.4); padding-bottom:1rem; }
+        .upload-area { display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap; }
+        .upload-area label { background:rgba(129,166,198,0.85); color:#fff; padding:0.5rem 1.2rem; border-radius:40px; font-weight:500; font-size:0.85rem; cursor:pointer; transition:background .2s; }
+        .upload-area label:hover { background:#6a8fb0; }
+        .upload-area input[type="file"] { display:none; }
+        .upload-area .file-status { font-size:0.8rem; color:#2c3e50; }
+        textarea { width:100%; padding:1rem 1.2rem; font-size:0.95rem; font-family:inherit; border:1px solid rgba(210,196,180,0.5); border-radius:1rem; background:rgba(255,255,255,0.7); backdrop-filter:blur(4px); color:#1e2f3a; resize:vertical; min-height:150px; line-height:1.7; transition:border-color .2s; outline:none; }
+        textarea:focus { border-color:#81A6C6; box-shadow:0 0 0 3px rgba(129,166,198,0.1); }
+        .button-group { display:flex; gap:0.6rem; margin:1rem 0 1.8rem 0; flex-wrap:wrap; align-items:center; }
+        .btn { font-weight:500; font-size:0.85rem; padding:0.5rem 1.6rem; border:none; border-radius:40px; background:rgba(129,166,198,0.85); color:#fff; cursor:pointer; transition:background .15s, transform .1s; font-family:inherit; backdrop-filter:blur(4px); }
+        .btn:hover { background:#6a8fb0; transform:translateY(-2px); }
+        .btn:active { transform:scale(0.96); }
+        .btn-outline { background:rgba(255,255,255,0.6); color:#1e2f3a; box-shadow:inset 0 0 0 1px rgba(210,196,180,0.4); }
+        .btn-outline:hover { background:rgba(243,227,208,0.7); box-shadow:none; }
+        #status { font-size:0.8rem; color:#2c3e50; margin-left:0.3rem; }
+        .output-label { font-size:0.8rem; font-weight:500; color:#2c3e50; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.6rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; }
+        .output-label .badge { background:rgba(243,227,208,0.7); font-size:0.6rem; padding:0.15rem 0.7rem; border-radius:20px; color:#1e2f3a; font-weight:400; letter-spacing:0; text-transform:none; }
+        .output-actions { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
+        .output-actions .btn-sm { font-size:0.7rem; padding:0.25rem 1rem; border-radius:30px; font-weight:500; border:none; cursor:pointer; transition:background .15s; background:rgba(170,205,220,0.7); color:#1e2f3a; font-family:inherit; }
+        .output-actions .btn-sm:hover { background:#81A6C6; color:#fff; }
+        .output-actions .btn-sm.copy-success { background:#81A6C6; color:#fff; }
+        .output-actions .btn-sm.download-success { background:#81A6C6; color:#fff; }
+        .result-container { background:rgba(255,255,255,0.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border-radius:1rem; padding:1.2rem 1.5rem; border:1px solid rgba(210,196,180,0.3); min-height:80px; }
+        .result-line { font-size:1.2rem; font-weight:700; line-height:1.8; letter-spacing:0.02em; padding:0.1rem 0; color:#1e2f3a; }
+        .name-last { color:#1e2f3a; }
+        .name-first { color:#2c3e50; }
+        .empty-state { color:#3a4f5f; font-weight:400; font-size:0.95rem; font-style:italic; }
+        .lookup-badge { background: #81A6C6; color: #fff; font-size:0.6rem; padding:0.1rem 0.7rem; border-radius:20px; margin-left:0.5rem; display:inline-block; }
+        @media (max-width:500px) { .app-wrapper { padding:1.2rem; } .result-container { padding:0.8rem 1rem; } .result-line { font-size:1rem; } textarea { font-size:0.85rem; min-height:120px; } }
     </style>
 </head>
 <body>
-
-    <!-- RAINBOW BACKGROUND -->
-    <div class="rainbow-bg" id="rainbowBg">
-        <div class="h"></div>
-        <div class="v"></div>
-    </div>
-
+    <div class="rainbow-bg" id="rainbowBg"><div class="h"></div><div class="v"></div></div>
     <div class="app-wrapper">
-        <div class="back-row">
-            <a href="index.html" class="back-btn">← Back to Dashboard</a>
-        </div>
-
+        <div class="back-row"><a href="index.html" class="back-btn">← Back to Dashboard</a></div>
         <h1>🔤 Name Fixer</h1>
 
-        <textarea id="nameInput" placeholder="Paste names here (one per line)"></textarea>
+        <!-- Upload area for Excel file -->
+        <div class="upload-area">
+            <label for="excelFile">📂 Upload correct_names.xlsx</label>
+            <input type="file" id="excelFile" accept=".xlsx,.xls" />
+            <span class="file-status" id="fileStatus">No file loaded</span>
+        </div>
 
+        <textarea id="nameInput" placeholder="Paste names here (one per line)"></textarea>
         <div class="button-group">
             <button class="btn" id="generateBtn">✨ Fix</button>
             <button class="btn btn-outline" id="clearBtn">Clear</button>
             <span id="status"></span>
         </div>
-
         <div class="output-label">
             <span>▼ Fixed result</span>
             <div class="output-actions">
                 <button class="btn-sm" id="copyBtn">📋 Copy All</button>
+                <button class="btn-sm" id="downloadBtn">💾 Download CSV</button>
                 <span class="badge">UPPERCASE</span>
             </div>
         </div>
-        <div class="result-container" id="resultContainer">
-            <div class="empty-state">Paste names above and click Fix</div>
-        </div>
+        <div class="result-container" id="resultContainer"><div class="empty-state">Paste names above and click Fix</div></div>
     </div>
 
     <script>
-        // ── rainbow generator ──
+        // ── Rainbow background (unchanged) ──
         (function() {
             const container = document.getElementById('rainbowBg');
-            const length = 25;
-            const animationTime = 45;
-            const purple = 'rgb(232 121 249)';
-            const blue = 'rgb(96 165 250)';
-            const green = 'rgb(94 234 212)';
-            const perms = [
-                [purple, blue, green],
-                [purple, green, blue],
-                [green, purple, blue],
-                [green, blue, purple],
-                [blue, green, purple],
-                [blue, purple, green]
-            ];
+            const length = 25, animationTime = 45;
+            const purple = 'rgb(232 121 249)', blue = 'rgb(96 165 250)', green = 'rgb(94 234 212)';
+            const perms = [[purple, blue, green], [purple, green, blue], [green, purple, blue], [green, blue, purple], [blue, green, purple], [blue, purple, green]];
             for (let i = 1; i <= length; i++) {
                 const el = document.createElement('div');
                 el.className = 'rainbow';
                 const perm = perms[Math.floor(Math.random() * perms.length)];
-                const shadow =
-                    `-160px 0 100px 50px white, ` +
-                    `-80px 0 80px 40px ${perm[0]}, ` +
-                    `0 0 80px 40px ${perm[1]}, ` +
-                    `80px 0 80px 40px ${perm[2]}, ` +
-                    `160px 0 100px 50px white`;
+                const shadow = `-160px 0 100px 50px white, -80px 0 80px 40px ${perm[0]}, 0 0 80px 40px ${perm[1]}, 80px 0 80px 40px ${perm[2]}, 160px 0 100px 50px white`;
                 el.style.boxShadow = shadow;
                 const duration = animationTime - (animationTime / length / 2) * i;
                 const delay = -(i / length) * animationTime;
@@ -336,16 +102,79 @@
             }
         })();
 
-        // ── name fixer logic ──
+        // ── Main logic ──
         (function() {
             const textarea = document.getElementById('nameInput');
             const generateBtn = document.getElementById('generateBtn');
             const clearBtn = document.getElementById('clearBtn');
             const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
             const container = document.getElementById('resultContainer');
             const status = document.getElementById('status');
+            const fileInput = document.getElementById('excelFile');
+            const fileStatus = document.getElementById('fileStatus');
 
+            let lookupMap = {}; // will store RIDER_TASK_USER_NAME → CORRECT
             let debounceTimer = null;
+
+            // ── Parse uploaded Excel file ──
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    fileStatus.textContent = 'No file selected';
+                    lookupMap = {};
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(loadEvent) {
+                    try {
+                        const data = new Uint8Array(loadEvent.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        // Expect first row to be headers: RIDER_TASK_USER_NAME, CORRECT
+                        let found = false;
+                        const map = {};
+                        for (let i = 0; i < json.length; i++) {
+                            const row = json[i];
+                            if (row.length >= 2) {
+                                const key = String(row[0] || '').trim();
+                                const value = String(row[1] || '').trim();
+                                if (key && value) {
+                                    // Skip header row if it contains "RIDER_TASK_USER_NAME"
+                                    if (key.toUpperCase() === 'RIDER_TASK_USER_NAME') continue;
+                                    map[key] = value;
+                                    found = true;
+                                }
+                            }
+                        }
+                        if (found) {
+                            lookupMap = map;
+                            fileStatus.textContent = `✅ Loaded ${Object.keys(map).length} entries from ${file.name}`;
+                        } else {
+                            fileStatus.textContent = '⚠️ No valid data found in the file.';
+                            lookupMap = {};
+                        }
+                    } catch (err) {
+                        fileStatus.textContent = '❌ Error reading file: ' + err.message;
+                        lookupMap = {};
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+
+            // ── Name‑fixing fallback logic (your original algorithm, enhanced) ──
+            const commonFirstNames = new Set([
+                'RIEL', 'ROMMEL', 'MICHAEL', 'REY', 'JHON', 'JOHN',
+                'MARK', 'PRINCE', 'JACK', 'LIONEL', 'FRANCIS',
+                'CHRISTIAN', 'EDUARDO', 'VINCENT', 'TROJAN', 'JUAN',
+                'JUN', 'JUNALD', 'URIEL', 'MIGUEL', 'ELMER', 'JHYZL',
+                'JB', 'JANNIEL', 'JED RIEL', 'JOHN MICHAEL', 'JOHN REY',
+                'JOHN ROMMEL', 'JAY AR', 'JJ LOUIE', 'JOEL REY', 'MARK ANTHONY',
+                'MART ANTHONY', 'MICHAEL JUN', 'NIÑO DJ', 'RON LEEM',
+                'VINCENT PAUL', 'MARK JAYSON', 'JAYSON NOL', 'JAN PATRICK',
+                'JOHN KARLO', 'JOHNPAULO', 'JOELYSA MAE', 'DANIEL ALBERTO'
+            ]);
 
             function escapeHtml(text) {
                 const div = document.createElement('div');
@@ -373,44 +202,144 @@
                 return cleaned.toUpperCase();
             }
 
+            function trimDots(str) {
+                return str.replace(/^\.+/, '').replace(/\.+$/, '').trim();
+            }
+
             function splitName(raw) {
                 let name = raw.trim();
                 if (!name) return null;
+
                 if (name.includes(',')) {
                     const parts = name.split(',').map(s => s.trim());
                     return { lastName: parts[0] || '', firstName: parts.slice(1).join(' ') || '' };
                 }
+
                 const words = name.split(/\s+/).filter(w => w.length > 0);
-                if (words.length === 0) return null;
-                if (words.length === 1) return { lastName: words[0], firstName: '' };
-                const lastWord = words[words.length - 1];
+                const filtered = words.filter(w => !/^\.+$/.test(w));
+                if (filtered.length === 0) return null;
+
+                const lastWord = filtered[filtered.length - 1];
                 if (lastWord.includes('.')) {
                     const dotIndex = lastWord.lastIndexOf('.');
                     const beforeDot = lastWord.substring(0, dotIndex);
                     const afterDot = lastWord.substring(dotIndex + 1);
                     if (afterDot.length > 0) {
-                        const firstNameParts = words.slice(0, words.length - 1);
-                        if (beforeDot.length > 0) firstNameParts.push(beforeDot + '.');
-                        return { lastName: afterDot, firstName: firstNameParts.join(' ') };
+                        const firstNameParts = filtered.slice(0, filtered.length - 1);
+                        let firstNameStr = firstNameParts.join(' ');
+                        if (beforeDot.length > 0) {
+                            firstNameStr = (firstNameStr ? firstNameStr + ' ' : '') + beforeDot + '.';
+                        }
+                        return { lastName: afterDot, firstName: firstNameStr };
                     }
                 }
-                if (words.length >= 2) {
-                    const secondLast = words[words.length - 2];
-                    if (/^[A-Za-z]\.$/.test(secondLast)) {
-                        return { lastName: words[words.length - 1], firstName: words.slice(0, words.length - 1).join(' ') };
+
+                const prefixes = ['DE', 'DEL', 'DELA', 'DE LA', 'SAN', 'SANTA', 'MAC', 'MC', 'VAN', 'VON', 'STA.', 'STO.'];
+                let lastName = '', firstName = '', found = false;
+
+                for (let i = 1; i < filtered.length; i++) {
+                    const firstWordOfSuffix = filtered[i].toUpperCase();
+                    const isPrefix = prefixes.some(p => firstWordOfSuffix === p || firstWordOfSuffix === p.replace('.', ''));
+                    if (isPrefix) {
+                        const suffix = filtered.slice(i).join(' ');
+                        if (filtered.slice(i).length >= 2) {
+                            lastName = suffix;
+                            firstName = filtered.slice(0, i).join(' ');
+                            found = true;
+                            break;
+                        }
                     }
                 }
-                return { lastName: words[words.length - 1], firstName: words.slice(0, words.length - 1).join(' ') };
+
+                if (!found) {
+                    lastName = filtered[filtered.length - 1];
+                    firstName = filtered.slice(0, filtered.length - 1).join(' ');
+                }
+
+                lastName = trimDots(lastName);
+                firstName = trimDots(firstName);
+
+                return { lastName, firstName };
             }
 
-            function normalizeName(raw) {
+            function cleanMiddleInitial(part) {
+                let cleaned = part.replace(/\.+/g, '.').trim();
+                if (cleaned.length === 1 && cleaned !== '.') cleaned += '.';
+                if (cleaned === '.') return '';
+                return cleaned;
+            }
+
+            function fallbackNormalize(raw) {
                 const parts = splitName(raw);
                 if (!parts) return '';
-                const { lastName, firstName } = parts;
+                let { lastName, firstName } = parts;
+
                 const cleanedLast = cleanAndUpper(lastName);
-                const cleanedFirst = cleanAndUpper(firstName);
+                let cleanedFirst = cleanAndUpper(firstName);
                 if (!cleanedFirst) return `${cleanedLast}, `;
-                return `${cleanedLast}, ${cleanedFirst}`;
+
+                cleanedFirst = trimDots(cleanedFirst);
+                if (!cleanedFirst) return `${cleanedLast}, `;
+
+                const rawWords = raw.trim().split(/\s+/).filter(w => w.length > 0 && !/^\.+$/.test(w));
+                const lastRawWord = rawWords[rawWords.length - 1] || '';
+                if (!raw.includes(',') && rawWords.length === 3 && !lastRawWord.includes('.')) {
+                    const firstWord = cleanAndUpper(rawWords[0]);
+                    const secondWord = cleanAndUpper(rawWords[1]);
+                    const lastWord = cleanAndUpper(rawWords[2]);
+                    if (commonFirstNames.has(`${firstWord} ${secondWord}`)) {
+                        return `${lastWord}, ${firstWord} ${secondWord}`;
+                    } else {
+                        let middleInitial = secondWord.charAt(0) + '.';
+                        if (secondWord.includes('.')) {
+                            middleInitial = cleanMiddleInitial(secondWord);
+                        }
+                        return `${lastWord}, ${firstWord} ${middleInitial}`;
+                    }
+                }
+
+                const firstWords = cleanedFirst.split(/\s+/).filter(w => w.length > 0);
+                if (firstWords.length === 0) return `${cleanedLast}, `;
+
+                let middleInitial = '';
+                let remaining = firstWords.slice();
+                const lastFirstWord = remaining[remaining.length - 1];
+                if (lastFirstWord && lastFirstWord.includes('.')) {
+                    middleInitial = cleanMiddleInitial(lastFirstWord);
+                    remaining.pop();
+                }
+
+                if (remaining.length >= 3 && !middleInitial) {
+                    const candidate = remaining.pop();
+                    if (candidate.length === 1) {
+                        middleInitial = candidate + '.';
+                    } else if (candidate.includes('.')) {
+                        middleInitial = cleanMiddleInitial(candidate);
+                    } else {
+                        middleInitial = candidate.charAt(0) + '.';
+                    }
+                    const firstNamePart = remaining.join(' ');
+                    return `${cleanedLast}, ${firstNamePart} ${middleInitial}`;
+                }
+
+                let firstNamePart = remaining.join(' ');
+                if (middleInitial) {
+                    return `${cleanedLast}, ${firstNamePart} ${middleInitial}`;
+                } else {
+                    return `${cleanedLast}, ${cleanedFirst}`;
+                }
+            }
+
+            // ── Main normalize function: lookup first, then fallback ──
+            function normalizeName(raw) {
+                const trimmed = raw.trim();
+                if (!trimmed) return '';
+                // Lookup in the map (case‑insensitive? we'll use exact match for now)
+                if (lookupMap[trimmed]) {
+                    return lookupMap[trimmed];
+                }
+                // fallback
+                return fallbackNormalize(trimmed);
             }
 
             function getFixedLines() {
@@ -438,7 +367,8 @@
                     }
                 });
                 container.innerHTML = html;
-                status.textContent = `✅ ${results.length} name(s) fixed`;
+                const lookupCount = Object.keys(lookupMap).length;
+                status.textContent = `✅ ${results.length} name(s) fixed ${lookupCount > 0 ? '(using lookup table)' : ''}`;
             }
 
             function clearAll() {
@@ -448,6 +378,8 @@
                 clearTimeout(debounceTimer);
                 copyBtn.textContent = '📋 Copy All';
                 copyBtn.className = 'btn-sm';
+                downloadBtn.textContent = '💾 Download CSV';
+                downloadBtn.className = 'btn-sm';
             }
 
             function copyAll() {
@@ -493,9 +425,35 @@
                 document.body.removeChild(temp);
             }
 
+            function downloadAll() {
+                const results = getFixedLines();
+                if (results.length === 0) {
+                    downloadBtn.textContent = '⚠️ Nothing to download';
+                    downloadBtn.className = 'btn-sm';
+                    setTimeout(() => { downloadBtn.textContent = '💾 Download CSV'; downloadBtn.className = 'btn-sm'; }, 1500);
+                    return;
+                }
+                const quotedResults = results.map(name => `"${name}"`);
+                const text = quotedResults.join('\n').trim();
+                const blob = new Blob([text], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'fixed_names.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                downloadBtn.textContent = '✅ Downloaded!';
+                downloadBtn.className = 'btn-sm download-success';
+                setTimeout(() => { downloadBtn.textContent = '💾 Download CSV'; downloadBtn.className = 'btn-sm'; }, 1800);
+            }
+
             generateBtn.addEventListener('click', generateLines);
             clearBtn.addEventListener('click', clearAll);
             copyBtn.addEventListener('click', copyAll);
+            downloadBtn.addEventListener('click', downloadAll);
 
             textarea.addEventListener('input', function() {
                 clearTimeout(debounceTimer);
