@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Name Fixer</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✏️</text></svg>" />
-    <!-- SheetJS for reading Excel files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        /* (your existing styles – unchanged) */
         * { margin:0; padding:0; box-sizing:border-box; }
         .rainbow-bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:#f0ebe5; }
         .rainbow { height:100vh; width:0; top:0; position:absolute; transform:rotate(10deg); transform-origin:top right; will-change:right; }
@@ -47,7 +47,6 @@
         .name-last { color:#1e2f3a; }
         .name-first { color:#2c3e50; }
         .empty-state { color:#3a4f5f; font-weight:400; font-size:0.95rem; font-style:italic; }
-        .lookup-badge { background: #81A6C6; color: #fff; font-size:0.6rem; padding:0.1rem 0.7rem; border-radius:20px; margin-left:0.5rem; display:inline-block; }
         @media (max-width:500px) { .app-wrapper { padding:1.2rem; } .result-container { padding:0.8rem 1rem; } .result-line { font-size:1rem; } textarea { font-size:0.85rem; min-height:120px; } }
     </style>
 </head>
@@ -57,11 +56,10 @@
         <div class="back-row"><a href="index.html" class="back-btn">← Back to Dashboard</a></div>
         <h1>🔤 Name Fixer</h1>
 
-        <!-- Upload area for Excel file -->
         <div class="upload-area">
-            <label for="excelFile">📂 Upload correct_names.xlsx</label>
+            <label for="excelFile">📂 Upload Excel (fallback)</label>
             <input type="file" id="excelFile" accept=".xlsx,.xls" />
-            <span class="file-status" id="fileStatus">No file loaded</span>
+            <span class="file-status" id="fileStatus">⏳ Loading correct_name.xlsx...</span>
         </div>
 
         <textarea id="nameInput" placeholder="Paste names here (one per line)"></textarea>
@@ -82,28 +80,28 @@
     </div>
 
     <script>
-        // ── Rainbow background (unchanged) ──
         (function() {
-            const container = document.getElementById('rainbowBg');
-            const length = 25, animationTime = 45;
-            const purple = 'rgb(232 121 249)', blue = 'rgb(96 165 250)', green = 'rgb(94 234 212)';
-            const perms = [[purple, blue, green], [purple, green, blue], [green, purple, blue], [green, blue, purple], [blue, green, purple], [blue, purple, green]];
-            for (let i = 1; i <= length; i++) {
-                const el = document.createElement('div');
-                el.className = 'rainbow';
-                const perm = perms[Math.floor(Math.random() * perms.length)];
-                const shadow = `-160px 0 100px 50px white, -80px 0 80px 40px ${perm[0]}, 0 0 80px 40px ${perm[1]}, 80px 0 80px 40px ${perm[2]}, 160px 0 100px 50px white`;
-                el.style.boxShadow = shadow;
-                const duration = animationTime - (animationTime / length / 2) * i;
-                const delay = -(i / length) * animationTime;
-                el.style.animation = `${duration}s linear infinite slide`;
-                el.style.animationDelay = `${delay}s`;
-                container.insertBefore(el, container.querySelector('.h'));
-            }
-        })();
+            // ── Rainbow background ──
+            (function() {
+                const container = document.getElementById('rainbowBg');
+                const length = 25, animationTime = 45;
+                const purple = 'rgb(232 121 249)', blue = 'rgb(96 165 250)', green = 'rgb(94 234 212)';
+                const perms = [[purple, blue, green], [purple, green, blue], [green, purple, blue], [green, blue, purple], [blue, green, purple], [blue, purple, green]];
+                for (let i = 1; i <= length; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'rainbow';
+                    const perm = perms[Math.floor(Math.random() * perms.length)];
+                    const shadow = `-160px 0 100px 50px white, -80px 0 80px 40px ${perm[0]}, 0 0 80px 40px ${perm[1]}, 80px 0 80px 40px ${perm[2]}, 160px 0 100px 50px white`;
+                    el.style.boxShadow = shadow;
+                    const duration = animationTime - (animationTime / length / 2) * i;
+                    const delay = -(i / length) * animationTime;
+                    el.style.animation = `${duration}s linear infinite slide`;
+                    el.style.animationDelay = `${delay}s`;
+                    container.insertBefore(el, container.querySelector('.h'));
+                }
+            })();
 
-        // ── Main logic ──
-        (function() {
+            // ── Main logic ──
             const textarea = document.getElementById('nameInput');
             const generateBtn = document.getElementById('generateBtn');
             const clearBtn = document.getElementById('clearBtn');
@@ -114,41 +112,78 @@
             const fileInput = document.getElementById('excelFile');
             const fileStatus = document.getElementById('fileStatus');
 
-            let lookupMap = {}; // will store RIDER_TASK_USER_NAME → CORRECT
+            let lookupMap = {};
             let debounceTimer = null;
 
-            // ── Parse uploaded Excel file ──
+            // ── Function to parse Excel data ──
+            function parseExcelData(data) {
+                try {
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    const map = {};
+                    let found = false;
+                    for (let i = 0; i < json.length; i++) {
+                        const row = json[i];
+                        if (row.length >= 2) {
+                            const key = String(row[0] || '').trim();
+                            const value = String(row[1] || '').trim();
+                            if (key && value && key.toUpperCase() !== 'RIDER_TASK_USER_NAME') {
+                                map[key] = value;
+                                found = true;
+                            }
+                        }
+                    }
+                    return found ? map : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            // ── Try to auto‑load the Excel file from the same directory ──
+            function autoLoadExcel() {
+                const possibleNames = ['correct_names.xlsx', 'correct_name.xlsx'];
+                let attemptIndex = 0;
+
+                function tryFetch() {
+                    if (attemptIndex >= possibleNames.length) {
+                        fileStatus.textContent = '⚠️ Could not auto‑load Excel. Please upload manually.';
+                        return;
+                    }
+                    const filename = possibleNames[attemptIndex];
+                    fetch(filename)
+                        .then(response => {
+                            if (!response.ok) throw new Error('File not found');
+                            return response.arrayBuffer();
+                        })
+                        .then(buffer => {
+                            const data = new Uint8Array(buffer);
+                            const map = parseExcelData(data);
+                            if (map) {
+                                lookupMap = map;
+                                fileStatus.textContent = `✅ Loaded ${Object.keys(map).length} entries from ${filename}`;
+                            } else {
+                                fileStatus.textContent = `⚠️ ${filename} loaded but no valid data found.`;
+                            }
+                        })
+                        .catch(() => {
+                            attemptIndex++;
+                            tryFetch();
+                        });
+                }
+                tryFetch();
+            }
+
+            // ── Handle manual upload ──
             fileInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
-                if (!file) {
-                    fileStatus.textContent = 'No file selected';
-                    lookupMap = {};
-                    return;
-                }
+                if (!file) return;
                 const reader = new FileReader();
                 reader.onload = function(loadEvent) {
                     try {
                         const data = new Uint8Array(loadEvent.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const json = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                        // Expect first row to be headers: RIDER_TASK_USER_NAME, CORRECT
-                        let found = false;
-                        const map = {};
-                        for (let i = 0; i < json.length; i++) {
-                            const row = json[i];
-                            if (row.length >= 2) {
-                                const key = String(row[0] || '').trim();
-                                const value = String(row[1] || '').trim();
-                                if (key && value) {
-                                    // Skip header row if it contains "RIDER_TASK_USER_NAME"
-                                    if (key.toUpperCase() === 'RIDER_TASK_USER_NAME') continue;
-                                    map[key] = value;
-                                    found = true;
-                                }
-                            }
-                        }
-                        if (found) {
+                        const map = parseExcelData(data);
+                        if (map) {
                             lookupMap = map;
                             fileStatus.textContent = `✅ Loaded ${Object.keys(map).length} entries from ${file.name}`;
                         } else {
@@ -163,7 +198,7 @@
                 reader.readAsArrayBuffer(file);
             });
 
-            // ── Name‑fixing fallback logic (your original algorithm, enhanced) ──
+            // ── Fallback name‑fixing logic ──
             const commonFirstNames = new Set([
                 'RIEL', 'ROMMEL', 'MICHAEL', 'REY', 'JHON', 'JOHN',
                 'MARK', 'PRINCE', 'JACK', 'LIONEL', 'FRANCIS',
@@ -330,15 +365,13 @@
                 }
             }
 
-            // ── Main normalize function: lookup first, then fallback ──
+            // ── Main normalize function ──
             function normalizeName(raw) {
                 const trimmed = raw.trim();
                 if (!trimmed) return '';
-                // Lookup in the map (case‑insensitive? we'll use exact match for now)
                 if (lookupMap[trimmed]) {
                     return lookupMap[trimmed];
                 }
-                // fallback
                 return fallbackNormalize(trimmed);
             }
 
@@ -472,6 +505,9 @@
 
             clearAll();
             textarea.placeholder = 'Paste names here (one per line)';
+
+            // ── Auto‑load on page start ──
+            autoLoadExcel();
         })();
     </script>
 </body>
