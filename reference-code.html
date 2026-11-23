@@ -6,7 +6,7 @@
     <title>Get Reference Code</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗃️</text></svg>" />
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
+    <script>(function(){var d=document.documentElement;try{if(window.top!==window)d.classList.add('embedded')}catch(e){d.classList.add('embedded')}var t=null;try{t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('theme')}catch(e){}d.dataset.theme=t||'dark';addEventListener('message',function(e){if(e.data&&e.data.theme)d.dataset.theme=e.data.theme})})()</script>
     <style>
 :root{--bg:#000;--hover:#080808;--pill:#181919;--card:#16181c;--line:#2f3336;--text:#e7e9ea;--muted:#71767b;
   --blue:#1d9bf0;--blue-h:#1a8cd8;--blue-soft:rgba(29,155,240,.12);--nav-bg:rgba(0,0,0,.65);
@@ -173,6 +173,10 @@ tbody tr:hover td{background:var(--hover)}
 .results-header .title{font-weight:800}.results-header .refresh-note{font-size:12px;color:var(--muted)}
 @keyframes slideDownResults{0%{opacity:0;transform:translateY(-12px)}100%{opacity:1;transform:translateY(0)}}
 .search-result.slide-down{animation:slideDownResults .3s ease-out forwards}
+
+/* when shown inside the index page */
+.embedded .back-row{display:none}
+.embedded .container,.embedded .app,.embedded .card,.embedded .dashboard{max-width:none;border-inline:0;min-height:0;padding-top:16px}
 
 @media (max-width:700px){
   .container,.app,.card,.dashboard{padding:12px 14px 40px;border-inline:0}
