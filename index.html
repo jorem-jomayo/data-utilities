@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jomayo Tools</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon fill='%231d9bf0' points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/></svg>" />
 <style>
   :root {
     --bg: #000; --hover: #080808; --pill: #181919; --card: #16181c; --line: #2f3336;
@@ -27,6 +27,7 @@
   }
   html, body { height: 100%; overflow: hidden; }
   b, strong { font-weight: 600; }
+  .i { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
   a { color: inherit; text-decoration: none; }
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
@@ -37,8 +38,9 @@
   .side { height: 100%; padding: 0 12px; display: flex; flex-direction: column; }
   .logo {
     width: 52px; height: 52px; margin: 2px 0; border-radius: 50%; display: grid; place-items: center;
-    font-size: 28px; transition: background .15s;
+    transition: background .15s; color: var(--blue);
   }
+  .logo .i { width: 28px; height: 28px; stroke-width: 2; }
   .logo:hover { background: var(--pill); }
   .nav { display: flex; flex-direction: column; align-items: stretch; margin-top: 2px; }
   .nav a {
@@ -46,7 +48,9 @@
     font-size: 16px; transition: background .15s; width: 100%;
   }
   .nav a:hover { background: var(--pill); }
-  .nav a .ic { width: 26px; text-align: center; font-size: 21px; flex: none; }
+  .nav a .ic { width: 26px; display: grid; place-items: center; flex: none; }
+  .nav a .ic .i { width: 24px; height: 24px; }
+  .nav a.active .ic .i { stroke-width: 2.2; }
   .nav a .lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4px; }
   .nav a.active { font-weight:600; background: var(--blue-soft); }
   .gh {
@@ -58,7 +62,8 @@
     margin: auto 0 12px; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 999px; transition: background .15s;
   }
   .me:hover { background: var(--pill); }
-  .me .av { width: 40px; height: 40px; border-radius: 50%; background: var(--blue-soft); display: grid; place-items: center; font-size: 20px; flex: none; }
+  .me .av { width: 40px; height: 40px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; flex: none; }
+  .me .av .i { width: 20px; height: 20px; }
   .me b { display: block; font-weight:600; }
   .me span { color: var(--muted); font-size: 14px; }
 
@@ -107,15 +112,17 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol><symbol id="i-toolbox" viewBox="0 0 24 24"><path d="M3 8h18v12H3z"/><path d="M8 8V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3"/><path d="M3 13h18"/></symbol><symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></symbol><symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol><symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></symbol><symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol><symbol id="i-top" viewBox="0 0 24 24"><path d="M5 3h14"/><path d="m18 13-6-6-6 6"/><path d="M12 7v14"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></symbol><symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></symbol><symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol><symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol><symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol></defs></svg>
+
 <div class="layout">
 
   <!-- left sidebar: the tools -->
   <header class="side">
-    <a class="logo" href="#" aria-label="Home">⭐</a>
+    <a class="logo" href="#" aria-label="Home"><svg class="i" aria-hidden="true"><use href="#i-star"/></svg></a>
     <nav class="nav" id="nav" aria-label="Tools"></nav>
     <a class="gh" href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">GitHub</a>
     <a class="me" href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">
-      <div class="av" aria-hidden="true">🧰</div>
+      <div class="av" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="#i-toolbox"/></svg></div>
       <div><b>Jomayo</b><span>@data-utilities</span></div>
     </a>
   </header>
@@ -138,20 +145,21 @@
 <script>
   // To add a tool, add one line here.
   const TOOLS = [
-    { icon: "📋", name: "For Summary Template", tag: "for process",     href: "summary-tool.html" },
-    { icon: "📬", name: "Email Lookup",         tag: "get email",       href: "email-lookup.html" },
-    { icon: "📄", name: "Get Reference Code",   tag: "from DLX",        href: "reference-code.html" },
-    { icon: "📆", name: "PIF NEW ENDO Mapper",  tag: "excel processor", href: "pif-new-endo-mapper.html" },
-    { icon: "🔝", name: "For Passes",           tag: "excel processor", href: "for-passes.html" }
+    { icon: "clipboard", name: "For Summary Template", tag: "for process",     href: "summary-tool.html" },
+    { icon: "inbox", name: "Email Lookup",         tag: "get email",       href: "email-lookup.html" },
+    { icon: "file", name: "Get Reference Code",   tag: "from DLX",        href: "reference-code.html" },
+    { icon: "calendar", name: "PIF NEW ENDO Mapper",  tag: "excel processor", href: "pif-new-endo-mapper.html" },
+    { icon: "top", name: "For Passes",           tag: "excel processor", href: "for-passes.html" }
   ];
 
   const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const ic = n => '<svg class="i" aria-hidden="true"><use href="#i-' + n + '"/></svg>';
   const slug = h => h.replace(/\.html$/, '');
   const frame = document.getElementById('frame'), title = document.getElementById('title'), tag = document.getElementById('tag');
 
   // sidebar
   document.getElementById('nav').innerHTML = TOOLS.map(t =>
-    `<a data-s="${esc(slug(t.href))}" href="#${esc(slug(t.href))}" title="${esc(t.name)}"><span class="ic">${t.icon}</span><span class="lb">${esc(t.name)}</span></a>`
+    `<a data-s="${esc(slug(t.href))}" href="#${esc(slug(t.href))}" title="${esc(t.name)}"><span class="ic">${ic(t.icon)}</span><span class="lb">${esc(t.name)}</span></a>`
   ).join('');
 
   // theme: Light / Dim / Dark

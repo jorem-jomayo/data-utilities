@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PIF NEW ENDO Mapper</title>
-    <!-- 📆 Favicon for the browser tab -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📆</text></svg>" />
+    <!-- <svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg> Favicon for the browser tab -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon fill='%231d9bf0' points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/></svg>" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js">
@@ -203,9 +203,18 @@ tbody tr:hover td{background:var(--hover)}
 .preview-area th{padding:8px 6px;position:sticky;top:0;z-index:2}
 .preview-area td{padding:6px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .actions{margin:24px 0 0}
+    
+/* icons */
+.i{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.2em;flex:none}
+h1 .i{width:1.05em;height:1.05em;color:var(--blue)}
+.upload-area .icon,.drop-zone .icon{line-height:0}
+.upload-area .icon .i,.drop-zone .icon .i{display:block;margin:0 auto 12px;width:44px;height:44px;stroke-width:1.4;color:var(--blue);vertical-align:baseline}
+.btn-sm .i,.copy-btn .i{width:1em;height:1em}
     </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol><symbol id="i-toolbox" viewBox="0 0 24 24"><path d="M3 8h18v12H3z"/><path d="M8 8V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3"/><path d="M3 13h18"/></symbol><symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></symbol><symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol><symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></symbol><symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol><symbol id="i-top" viewBox="0 0 24 24"><path d="M5 3h14"/><path d="m18 13-6-6-6 6"/><path d="M12 7v14"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></symbol><symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></symbol><symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol><symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol><symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol></defs></svg>
+
 
     <!-- ═══ RAINBOW BACKGROUND ═══ -->
     <div class="rainbow-bg" id="rainbowBg">
@@ -217,14 +226,14 @@ tbody tr:hover td{background:var(--hover)}
     <div class="card">
         <!-- Back to Dashboard button -->
         <div class="back-row">
-            <a href="index.html" class="back-btn">← Back to Dashboard</a>
+            <a href="index.html" class="back-btn"><svg class="i" aria-hidden="true"><use href="#i-arrow-left"/></svg> Back to Dashboard</a>
         </div>
 
-        <h1>📆 PIF NEW ENDO Mapper</h1>
+        <h1><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg> PIF NEW ENDO Mapper</h1>
         <div class="sub">Generate SUMMARY PIF HOMELOAN NEW ENDO from your PIF Excel file.</div>
 
         <div class="drop-zone" id="dropZone">
-            <div class="icon">📂</div>
+            <div class="icon"><svg class="i" aria-hidden="true"><use href="#i-folder-open"/></svg></div>
             <p>Drop your Excel file here</p>
             <div class="hint">or click to browse (.xlsx, .xls)</div>
             <input type="file" id="fileInput" accept=".xlsx,.xls" />
@@ -241,10 +250,10 @@ tbody tr:hover td{background:var(--hover)}
 
         <div class="actions">
             <button class="btn primary" id="downloadBtn" disabled>
-                ⬇️ Download SUMMARY.xlsx
+                <svg class="i" aria-hidden="true"><use href="#i-download"/></svg> Download SUMMARY.xlsx
             </button>
             <button class="btn secondary" id="resetBtn" disabled>
-                🔄 Clear / Reset
+                <svg class="i" aria-hidden="true"><use href="#i-refresh"/></svg> Clear / Reset
             </button>
             <span class="stats" id="stats">No data loaded</span>
         </div>
@@ -305,11 +314,11 @@ tbody tr:hover td{background:var(--hover)}
 
             // ----- Library checks -----
             if (typeof XLSX === 'undefined') {
-                setStatus('❌ SheetJS library failed to load. Please check your internet connection.', 'error');
+                setStatus('SheetJS library failed to load. Please check your internet connection.', 'error');
                 console.error('XLSX is not defined.');
             }
             if (typeof ExcelJS === 'undefined') {
-                setStatus('❌ ExcelJS library failed to load. Please check your internet connection.', 'error');
+                setStatus('ExcelJS library failed to load. Please check your internet connection.', 'error');
                 console.error('ExcelJS is not defined.');
             }
 
@@ -330,7 +339,7 @@ tbody tr:hover td{background:var(--hover)}
                 downloadBtn.disabled = true;
                 resetBtn.disabled = true;
                 fileInput.value = '';
-                setStatus('📂 Drop your PIF Excel file here, or click to browse.', 'info');
+                setStatus('Drop your PIF Excel file here, or click to browse.', 'info');
             }
 
             // ----- Get today in MM/DD/YYYY -----
@@ -601,7 +610,7 @@ tbody tr:hover td{background:var(--hover)}
                     }).join('') + '</tr>';
                 }).join('');
 
-                statsEl.textContent = `✅ ${data.length} rows generated (${data.length / 2} source records)`;
+                statsEl.textContent = `${data.length} rows generated (${data.length / 2} source records)`;
                 downloadBtn.disabled = false;
                 resetBtn.disabled = false;
             }
@@ -614,7 +623,7 @@ tbody tr:hover td{background:var(--hover)}
                 }
 
                 if (typeof ExcelJS === 'undefined') {
-                    setStatus('❌ ExcelJS library not loaded. Cannot format Excel file.', 'error');
+                    setStatus('ExcelJS library not loaded. Cannot format Excel file.', 'error');
                     return;
                 }
 
@@ -736,37 +745,37 @@ tbody tr:hover td{background:var(--hover)}
                         link.click();
                         document.body.removeChild(link);
                         setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-                        setStatus(`✅ File "${fileName}" downloaded successfully!`, 'success');
+                        setStatus(`File "${fileName}" downloaded successfully!`, 'success');
                     }).catch(err => {
                         console.error(err);
-                        setStatus(`❌ Error generating Excel: ${err.message}`, 'error');
+                        setStatus(`Error generating Excel: ${err.message}`, 'error');
                     });
 
                 } catch (err) {
                     console.error(err);
-                    setStatus(`❌ Error: ${err.message}`, 'error');
+                    setStatus(`Error: ${err.message}`, 'error');
                 }
             }
 
             // ----- Process uploaded file -----
             function processFile(file) {
                 if (!file) {
-                    setStatus('❌ No file selected.', 'error');
+                    setStatus('No file selected.', 'error');
                     return;
                 }
 
                 const ext = file.name.split('.').pop().toLowerCase();
                 if (ext !== 'xlsx' && ext !== 'xls') {
-                    setStatus(`❌ File "${file.name}" is not an Excel file (.xlsx or .xls).`, 'error');
+                    setStatus(`File "${file.name}" is not an Excel file (.xlsx or .xls).`, 'error');
                     return;
                 }
 
                 if (typeof XLSX === 'undefined') {
-                    setStatus('❌ SheetJS library not loaded. Please check your internet connection and refresh.', 'error');
+                    setStatus('SheetJS library not loaded. Please check your internet connection and refresh.', 'error');
                     return;
                 }
 
-                setStatus('📖 Reading file...', 'info');
+                setStatus('Reading file...', 'info');
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -777,7 +786,7 @@ tbody tr:hover td{background:var(--hover)}
                         const json = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
 
                         if (!json || json.length < 2) {
-                            setStatus('❌ File appears empty or has no data rows.', 'error');
+                            setStatus('File appears empty or has no data rows.', 'error');
                             return;
                         }
 
@@ -789,17 +798,17 @@ tbody tr:hover td{background:var(--hover)}
                         sourceFileName = file.name;
 
                         renderPreview(outputData);
-                        setStatus(`✅ Success! ${outputData.length} rows mapped.`, 'success');
+                        setStatus(`Success! ${outputData.length} rows mapped.`, 'success');
                         downloadBtn.disabled = false;
                         resetBtn.disabled = false;
 
                     } catch (err) {
                         console.error(err);
-                        setStatus(`❌ Error: ${err.message}`, 'error');
+                        setStatus(`Error: ${err.message}`, 'error');
                     }
                 };
                 reader.onerror = function() {
-                    setStatus('❌ Failed to read file.', 'error');
+                    setStatus('Failed to read file.', 'error');
                 };
                 reader.readAsArrayBuffer(file);
             }
@@ -840,7 +849,7 @@ tbody tr:hover td{background:var(--hover)}
                 if (parsedData.length > 0) {
                     downloadSummary(parsedData, sourceFileName);
                 } else {
-                    setStatus('❌ No data to download. Please load a file first.', 'error');
+                    setStatus('No data to download. Please load a file first.', 'error');
                 }
             });
 
@@ -848,12 +857,12 @@ tbody tr:hover td{background:var(--hover)}
             resetBtn.addEventListener('click', resetAll);
 
             // Initial status
-            setStatus('📂 Drop your PIF Excel file here, or click to browse.', 'info');
+            setStatus('Drop your PIF Excel file here, or click to browse.', 'info');
             resetBtn.disabled = true;
 
             // Library checks
-            if (typeof XLSX !== 'undefined') console.log('✅ SheetJS loaded.');
-            if (typeof ExcelJS !== 'undefined') console.log('✅ ExcelJS loaded.');
+            if (typeof XLSX !== 'undefined') console.log('SheetJS loaded.');
+            if (typeof ExcelJS !== 'undefined') console.log('ExcelJS loaded.');
         })();
     </script>
 
