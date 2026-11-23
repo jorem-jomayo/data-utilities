@@ -1,339 +1,209 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jomayo</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>" />
-    <style>
-        /* ── reset ── */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jomayo Tools</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>" />
+<style>
+  :root {
+    --bg: #000; --hover: #080808; --card: #16181c; --line: #2f3336;
+    --text: #e7e9ea; --muted: #71767b; --blue: #1d9bf0; --blue-h: #1a8cd8;
+    --blue-soft: rgba(29,155,240,.1); --banner: linear-gradient(135deg,#1d9bf0,#7856ff 55%,#f91880);
+    --nav-bg: rgba(0,0,0,.65);
+  }
+  [data-theme="dim"] {
+    --bg: #15202b; --hover: #192734; --card: #1e2732; --line: #38444d;
+    --text: #f7f9f9; --muted: #8b98a5; --nav-bg: rgba(21,32,43,.75);
+  }
+  [data-theme="light"] {
+    --bg: #fff; --hover: #f7f9f9; --card: #f7f9f9; --line: #eff3f4;
+    --text: #0f1419; --muted: #536471; --nav-bg: rgba(255,255,255,.8);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.33; transition: background .2s, color .2s;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-        body {
-            font-family: -apple-system, "SF Pro", "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1.5rem;
-            background: #f0ebe5;
-            overflow: hidden;
-            position: relative;
-        }
+  .shell { max-width: 600px; margin: 0 auto; min-height: 100vh; border-inline: 1px solid var(--line); }
 
-        /* ── rainbow background layer ── */
-        .rainbow-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-            background: #f0ebe5;
-        }
+  /* top bar */
+  .bar {
+    position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 24px;
+    padding: 6px 16px; height: 53px; background: var(--nav-bg);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .bar h1 { font-size: 20px; font-weight: 800; }
+  .bar small { display: block; font-size: 13px; font-weight: 400; color: var(--muted); }
+  .bar .push { margin-left: auto; }
 
-        .rainbow {
-            height: 100vh;
-            width: 0;
-            top: 0;
-            position: absolute;
-            transform: rotate(10deg);
-            transform-origin: top right;
-            will-change: right;
-        }
+  /* theme switch */
+  .themes { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+  .themes button {
+    border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700;
+    padding: 5px 12px; border-radius: 999px; cursor: pointer; transition: background .15s, color .15s;
+  }
+  .themes button[aria-pressed="true"] { background: var(--blue); color: #fff; }
+  .themes button:not([aria-pressed="true"]):hover { color: var(--text); }
 
-        .h {
-            box-shadow: 0 0 50vh 40vh rgba(255, 255, 255, 0.85);
-            width: 100vw;
-            height: 0;
-            bottom: 0;
-            left: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-        .v {
-            box-shadow: 0 0 35vw 25vw rgba(255, 255, 255, 0.80);
-            width: 0;
-            height: 100vh;
-            bottom: 0;
-            left: 0;
-            position: absolute;
-            pointer-events: none;
-        }
+  /* profile header */
+  .banner { height: 150px; background: var(--banner); }
+  .profile { padding: 12px 16px 16px; border-bottom: 1px solid var(--line); }
+  .avatar {
+    width: 84px; height: 84px; border-radius: 50%; margin-top: -54px; display: grid; place-items: center;
+    font-size: 42px; background: var(--bg); border: 4px solid var(--bg); outline: 1px solid var(--line);
+  }
+  .profile h2 { font-size: 20px; font-weight: 800; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+  .profile h2 svg { width: 20px; height: 20px; fill: var(--blue); }
+  .handle { color: var(--muted); }
+  .bio { margin-top: 12px; }
+  .meta { margin-top: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .meta a { color: var(--blue); }
+  .meta a:hover { text-decoration: underline; }
+  .stats { margin-top: 12px; display: flex; gap: 20px; color: var(--muted); }
+  .stats b { color: var(--text); font-weight: 700; }
 
-        @keyframes slide {
-            from {
-                right: -25vw;
-            }
-            to {
-                right: 125vw;
-            }
-        }
+  /* tabs / search */
+  .tabs { display: flex; border-bottom: 1px solid var(--line); }
+  .tab { flex: 1; text-align: center; padding: 16px 0 0; font-weight: 700; color: var(--text); }
+  .tab span { display: inline-block; padding-bottom: 14px; border-bottom: 4px solid var(--blue); border-radius: 2px; }
+  .search { padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  .search input {
+    width: 100%; background: var(--card); border: 1px solid transparent; color: var(--text);
+    border-radius: 999px; padding: 11px 18px; font: inherit; transition: border-color .15s, background .15s;
+  }
+  .search input::placeholder { color: var(--muted); }
+  .search input:focus { outline: 0; border-color: var(--blue); background: var(--bg); }
 
-        /* ── dashboard card ── */
-        .dashboard {
-            position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.82);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-radius: 32px;
-            padding: 2.5rem 3rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: background 0.3s;
-        }
+  /* tool rows, styled as posts */
+  .tool { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); transition: background .15s; }
+  .tool:hover { background: var(--hover); }
+  .tool .pic {
+    flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--blue-soft);
+    display: grid; place-items: center; font-size: 20px;
+  }
+  .tool .body { min-width: 0; flex: 1; }
+  .tool .top { display: flex; flex-wrap: wrap; gap: 0 6px; align-items: baseline; }
+  .tool .name { font-weight: 700; }
+  .tool .tag { color: var(--muted); }
+  .tool:hover .name { text-decoration: underline; }
+  .tool .desc { margin-top: 2px; overflow-wrap: anywhere; }
+  .tool .open {
+    margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px;
+    color: var(--blue); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px;
+    transition: background .15s, border-color .15s;
+  }
+  .tool:hover .open { background: var(--blue); border-color: var(--blue); color: #fff; }
 
-        .header {
-            margin-bottom: 2.5rem;
-            border-bottom: 2px solid rgba(170, 205, 220, 0.5);
-            padding-bottom: 1.5rem;
-        }
+  .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+  .empty b { display: block; color: var(--text); font-size: 20px; margin-bottom: 4px; }
 
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+  footer { padding: 24px 16px 48px; color: var(--muted); font-size: 13px; text-align: center; }
+  footer a { color: var(--blue); }
+  footer a:hover { text-decoration: underline; }
 
-        .header h1 small {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: #6a7f8f;
-            margin-left: 4px;
-        }
-
-        .header p {
-            color: #5a6f7f;
-            margin-top: 6px;
-            font-size: 1rem;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border-radius: 18px;
-            padding: 1.8rem 1.5rem 1.5rem;
-            border: 1px solid rgba(210, 196, 180, 0.4);
-            transition: all 0.25s ease;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(129, 166, 198, 0.20);
-            border-color: rgba(129, 166, 198, 0.7);
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .card .icon {
-            font-size: 2.4rem;
-            margin-bottom: 0.6rem;
-        }
-
-        .card h3 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 4px;
-        }
-
-        .card .desc {
-            font-size: 0.85rem;
-            color: #5a6f7f;
-            line-height: 1.5;
-            flex: 1;
-        }
-
-        .card .badge {
-            margin-top: 0.8rem;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #3a4f5f;
-            background: rgba(243, 227, 208, 0.7);
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            align-self: flex-start;
-            font-weight: 600;
-        }
-
-        .footer {
-            margin-top: 2.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(210, 196, 180, 0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            font-size: 0.8rem;
-            color: #7a8f9f;
-        }
-
-        .footer a {
-            color: #81A6C6;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 600px) {
-            .dashboard {
-                padding: 1.5rem;
-                backdrop-filter: blur(18px);
-                -webkit-backdrop-filter: blur(18px);
-            }
-            .header h1 {
-                font-size: 1.4rem;
-                flex-wrap: wrap;
-            }
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  @media (max-width: 600px) { .shell { border-inline: 0; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
 </head>
 <body>
+<div class="shell">
 
-    <!-- ═══ RAINBOW BACKGROUND ═══ -->
-    <div class="rainbow-bg" id="rainbowBg">
-        <div class="h"></div>
-        <div class="v"></div>
+  <div class="bar">
+    <div>
+      <h1>Tools</h1>
+      <small id="count"></small>
     </div>
-
-    <!-- ═══ DASHBOARD ═══ -->
-    <div class="dashboard">
-        <div class="header">
-            <h1>
-                🧰 Tools
-                <small>For everyday use</small>
-            </h1>
-            <p>Internal tools for data processing, name formatting, email lookup, and reference code extraction.</p>
-        </div>
-
-        <div class="grid">
-
-            <a href="summary-tool.html" class="card">
-                <span class="icon">📋</span>
-                <h3>For Summary Template</h3>
-                <div class="desc">Will fix your file from INDEXONE to become the SUMMARY TEMPLATE of yours.</div>
-                <span class="badge">for process</span>
-            </a>
-
-            <a href="name-fixer.html" class="card">
-                <span class="icon">🔤</span>
-                <h3>Name Fixer</h3>
-                <div class="desc">Gonna fix the names of FIELD MAN from OPENCI.</div>
-                <span class="badge">gonna fix name</span>
-            </a>
-
-            <a href="email-lookup.html" class="card">
-                <span class="icon">📬</span>
-                <h3>Email Lookup</h3>
-                <div class="desc">Paste the FINAL and copy the EMAIL ADDRESS bruh</div>
-                <span class="badge">get email add</span>
-            </a>
-
-            <a href="reference-code.html" class="card">
-                <span class="icon">📄</span>
-                <h3>Get Reference Code</h3>
-                <div class="desc">Extraction file from DLX is gonna get your correct REFERENCE CODE.</div>
-                <span class="badge">from DLX lmao</span>
-            </a>
-
-            <a href="placement-lookup.html" class="card">
-                <span class="icon">👀</span>
-                <h3>Placement</h3>
-                <div class="desc">Find BANK and PLACEMENT from CH CODE using the uploaded Excel file.</div>
-                <span class="badge">extract data</span>
-            </a>
-
-            <!-- ═══ NEW CARD: PIF NEW ENDO MAPPER ═══ -->
-            <a href="pif-new-endo-mapper.html" class="card">
-                <span class="icon">📆</span>
-                <h3>PIF NEW ENDO Mapper</h3>
-                <div class="desc">Generate SUMMARY PIF HOMELOAN NEW ENDO from your PIF Excel file.</div>
-                <span class="badge">excel processor</span>
-            </a>
-
-            <!-- ═══ FOR PASSES ═══ -->
-            <a href="for-passes.html" class="card">
-                <span class="icon">🔝</span>
-                <h3>For Passes</h3>
-                <div class="desc">Extract data from RESULT sheet, filter by BANK = "PIF HOME LOAN", split CANCEL rows, and create a UNIQ sheet.</div>
-                <span class="badge">excel processor</span>
-            </a>
-
-        </div>
-
-        <div class="footer">
-            <span>© 2026 · Internal use only</span>
-            <span>
-                Built with 💚 &nbsp;·&nbsp;
-                <a href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank">GitHub</a>
-            </span>
-        </div>
+    <div class="themes push" role="group" aria-label="Theme">
+      <button data-set="light" aria-pressed="false">Light</button>
+      <button data-set="dim" aria-pressed="false">Dim</button>
+      <button data-set="dark" aria-pressed="true">Dark</button>
     </div>
+  </div>
 
-    <script>
-        (function() {
-            const container = document.getElementById('rainbowBg');
-            const length = 25;
-            const animationTime = 45;
+  <div class="banner" aria-hidden="true"></div>
+  <section class="profile">
+    <div class="avatar" aria-hidden="true">⭐</div>
+    <h2>Jomayo
+      <svg viewBox="0 0 24 24" aria-label="Verified"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91C2.88 9.33 2 10.57 2 12s.88 2.67 2.19 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
+    </h2>
+    <div class="handle">@data-utilities</div>
+    <p class="bio">Internal tools for data processing, name formatting, email lookup, and reference code extraction. For everyday use.</p>
+    <div class="meta">
+      <span>🧰 Internal use only</span>
+      <a href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">github.com/data-utilities</a>
+    </div>
+  </section>
 
-            const purple = 'rgb(232 121 249)';
-            const blue = 'rgb(96 165 250)';
-            const green = 'rgb(94 234 212)';
+  <nav class="tabs"><div class="tab"><span>All tools</span></div></nav>
+  <div class="search">
+    <input id="q" type="search" placeholder="Search tools" autocomplete="off" aria-label="Search tools" />
+  </div>
 
-            const perms = [
-                [purple, blue, green],
-                [purple, green, blue],
-                [green, purple, blue],
-                [green, blue, purple],
-                [blue, green, purple],
-                [blue, purple, green]
-            ];
+  <main id="list"></main>
 
-            for (let i = 1; i <= length; i++) {
-                const el = document.createElement('div');
-                el.className = 'rainbow';
-                const perm = perms[Math.floor(Math.random() * perms.length)];
-                const shadow =
-                    `-130px 0 80px 40px white, ` +
-                    `-50px 0 50px 25px ${perm[0]}, ` +
-                    `0 0 50px 25px ${perm[1]}, ` +
-                    `50px 0 50px 25px ${perm[2]}, ` +
-                    `130px 0 80px 40px white`;
-                el.style.boxShadow = shadow;
-                const duration = animationTime - (animationTime / length / 2) * i;
-                const delay = -(i / length) * animationTime;
-                el.style.animation = `${duration}s linear infinite slide`;
-                el.style.animationDelay = `${delay}s`;
-                container.insertBefore(el, container.querySelector('.h'));
-            }
-        })();
-    </script>
+  <footer>© 2026 Internal use only. Built with 💚 · <a href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">GitHub</a></footer>
+</div>
 
+<script>
+  // To add a tool, add one line here.
+  const TOOLS = [
+    { icon: "📋", name: "For Summary Template", tag: "for process",   href: "summary-tool.html",
+      desc: "Fixes your file from INDEXONE so it becomes your SUMMARY TEMPLATE." },
+    { icon: "🔤", name: "Name Fixer",           tag: "fix names",     href: "name-fixer.html",
+      desc: "Fixes the names of FIELD MAN from OPENCI." },
+    { icon: "📬", name: "Email Lookup",         tag: "get email",     href: "email-lookup.html",
+      desc: "Paste the FINAL and copy the EMAIL ADDRESS." },
+    { icon: "📄", name: "Get Reference Code",   tag: "from DLX",      href: "reference-code.html",
+      desc: "Extracts the file from DLX and gets your correct REFERENCE CODE." },
+    { icon: "👀", name: "Placement",            tag: "extract data",  href: "placement-lookup.html",
+      desc: "Finds BANK and PLACEMENT from a CH CODE using the uploaded Excel file." },
+    { icon: "📆", name: "PIF NEW ENDO Mapper",  tag: "excel processor", href: "pif-new-endo-mapper.html",
+      desc: "Generates SUMMARY PIF HOMELOAN NEW ENDO from your PIF Excel file." },
+    { icon: "🔝", name: "For Passes",           tag: "excel processor", href: "for-passes.html",
+      desc: "Extracts data from the RESULT sheet, filters BANK = \"PIF HOME LOAN\", splits CANCEL rows, and creates a UNIQ sheet." }
+  ];
+
+  const list = document.getElementById('list');
+  const count = document.getElementById('count');
+  const q = document.getElementById('q');
+  const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  function render() {
+    const term = q.value.trim().toLowerCase();
+    const hits = TOOLS.filter(t => (t.name + ' ' + t.tag + ' ' + t.desc).toLowerCase().includes(term));
+    count.textContent = hits.length + (hits.length === 1 ? ' tool' : ' tools');
+    list.innerHTML = hits.length ? hits.map(t => `
+      <a class="tool" href="${esc(t.href)}">
+        <div class="pic" aria-hidden="true">${t.icon}</div>
+        <div class="body">
+          <div class="top"><span class="name">${esc(t.name)}</span><span class="tag">@${esc(t.tag.replace(/\s+/g,'_'))}</span></div>
+          <p class="desc">${esc(t.desc)}</p>
+          <span class="open">Open tool</span>
+        </div>
+      </a>`).join('') : `<div class="empty"><b>No tools found</b>Try a different word.</div>`;
+  }
+  q.addEventListener('input', render);
+  render();
+
+  // theme: Light / Dim / Dark (like X)
+  const root = document.documentElement;
+  const btns = document.querySelectorAll('.themes button');
+  function setTheme(t) {
+    root.dataset.theme = t;
+    btns.forEach(b => b.setAttribute('aria-pressed', b.dataset.set === t));
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  }
+  let saved = 'dark';
+  try { saved = localStorage.getItem('theme') || 'dark'; } catch (e) {}
+  setTheme(saved);
+  btns.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.set)));
+</script>
 </body>
 </html>
