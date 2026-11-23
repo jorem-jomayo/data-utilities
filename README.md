@@ -9,10 +9,8 @@ A set of small, single-page web tools for everyday data processing: name formatt
 | Tool | File | What it does |
 | --- | --- | --- |
 | For Summary Template | `summary-tool.html` | Fixes your file from INDEXONE so it becomes your SUMMARY TEMPLATE. |
-| Name Fixer | `name-fixer.html` | Fixes the names of FIELD MAN from OPENCI. |
 | Email Lookup | `email-lookup.html` | Paste the FINAL and copy the EMAIL ADDRESS. |
 | Get Reference Code | `reference-code.html` | Extracts the file from DLX and gets your correct REFERENCE CODE. |
-| Placement | `placement-lookup.html` | Finds BANK and PLACEMENT from a CH CODE using the uploaded Excel file. |
 | PIF NEW ENDO Mapper | `pif-new-endo-mapper.html` | Generates SUMMARY PIF HOMELOAN NEW ENDO from your PIF Excel file. |
 | For Passes | `for-passes.html` | Extracts data from the RESULT sheet, filters BANK = "PIF HOME LOAN", splits CANCEL rows, and creates a UNIQ sheet. |
 
@@ -22,10 +20,8 @@ A set of small, single-page web tools for everyday data processing: name formatt
 data-utilities/
 ├── index.html                  # landing page with sidebar and tool list
 ├── summary-tool.html
-├── name-fixer.html
 ├── email-lookup.html
 ├── reference-code.html
-├── placement-lookup.html
 ├── pif-new-endo-mapper.html
 ├── for-passes.html
 └── README.md
@@ -68,7 +64,7 @@ The landing page has three display modes, the same as X: **Light**, **Dim**, and
 
 ## A note on data
 
-These tools are for internal use. Do not commit real data files (for example `PLACEMENT.xlsx`, `correct_names.xlsx`, or any export containing account or loan details) to a public repository. If the repo is public, add them to a `.gitignore` or keep the repo private.
+These tools are for internal use. Do not commit real data files (for example any Excel export containing account or loan details) to a public repository. If the repo is public, add them to a `.gitignore` or keep the repo private.
 
 ## License
 
