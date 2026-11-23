@@ -25,27 +25,28 @@
     font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 15px; line-height: 1.33; -webkit-font-smoothing: antialiased; transition: background .2s, color .2s;
   }
+  html, body { height: 100%; overflow: hidden; }
   a { color: inherit; text-decoration: none; }
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-  /* ── three columns like X ── */
-  .layout { display: grid; grid-template-columns: 275px 600px 350px; justify-content: center; min-height: 100vh; }
+  /* ── sidebar + one wide column ── */
+  .layout { display: grid; grid-template-columns: 275px minmax(0, 1100px); justify-content: center; height: 100vh; height: 100dvh; }
 
   /* left sidebar */
-  .side { position: sticky; top: 0; height: 100vh; padding: 0 12px; display: flex; flex-direction: column; }
+  .side { height: 100%; padding: 0 12px; display: flex; flex-direction: column; }
   .logo {
     width: 52px; height: 52px; margin: 2px 0; border-radius: 50%; display: grid; place-items: center;
     font-size: 28px; transition: background .15s;
   }
   .logo:hover { background: var(--pill); }
-  .nav { display: flex; flex-direction: column; align-items: flex-start; margin-top: 2px; }
+  .nav { display: flex; flex-direction: column; align-items: stretch; margin-top: 2px; }
   .nav a {
-    display: flex; align-items: center; gap: 20px; padding: 10px 12px; border-radius: 999px;
-    font-size: 16px; transition: background .15s; max-width: 100%;
+    display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: 999px;
+    font-size: 16px; transition: background .15s; width: 100%;
   }
   .nav a:hover { background: var(--pill); }
   .nav a .ic { width: 26px; text-align: center; font-size: 21px; flex: none; }
-  .nav a .lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+  .nav a .lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4px; }
   .nav a.active { font-weight: 800; background: var(--blue-soft); }
   .gh {
     margin: 16px 0 0; width: 90%; text-align: center; background: var(--blue); color: #fff; font-weight: 700; font-size: 15px;
@@ -60,8 +61,8 @@
   .me b { display: block; font-weight: 700; }
   .me span { color: var(--muted); font-size: 14px; }
 
-  /* center feed */
-  .main { border-inline: 1px solid var(--line); min-width: 0; }
+  /* center: header + the open tool */
+  .main { border-inline: 1px solid var(--line); min-width: 0; height: 100%; overflow: hidden; }
   .head {
     position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px;
     padding: 0 16px; height: 53px; background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -76,68 +77,20 @@
   }
   .themes button[aria-pressed="true"] { background: var(--blue); color: #fff; }
   .themes button:not([aria-pressed="true"]):hover { color: var(--text); }
-
-  .search { padding: 10px 16px; border-bottom: 1px solid var(--line); }
-  .search input {
-    width: 100%; background: var(--card); border: 1px solid transparent; color: var(--text);
-    border-radius: 999px; padding: 11px 18px; font: inherit; transition: border-color .15s, background .15s;
-  }
-  .search input::placeholder { color: var(--muted); }
-  .search input:focus { outline: 0; border-color: var(--blue); background: var(--bg); }
-
-  .tool { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); transition: background .15s; }
-  .tool:hover { background: var(--hover); }
-  .tool .pic { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--blue-soft); display: grid; place-items: center; font-size: 20px; }
-  .tool .body { min-width: 0; flex: 1; }
-  .tool .top { display: flex; flex-wrap: wrap; gap: 0 6px; align-items: baseline; }
-  .tool .name { font-weight: 700; font-size: 14.5px; }
-  .tool .tag { color: var(--muted); font-size: 14px; }
-  .tool:hover .name { text-decoration: underline; }
-  .tool .desc { margin-top: 2px; overflow-wrap: anywhere; font-size: 14px; }
-  .tool .open {
-    margin-top: 10px; display: inline-flex; font-weight: 700; font-size: 13px; color: var(--blue);
-    border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; transition: background .15s, border-color .15s, color .15s;
-  }
-  .tool:hover .open { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
-  .empty b { display: block; color: var(--text); font-size: 20px; margin-bottom: 4px; }
-
-  /* tool opens inside the center column */
-  .back { display: none; width: 34px; height: 34px; border-radius: 50%; place-items: center; font-size: 18px; transition: background .15s; flex: none; }
-  .back:hover { background: var(--pill); }
-  .head .ttl { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .frame { display: none; width: 100%; height: calc(100vh - 53px); height: calc(100dvh - 53px); border: 0; background: var(--bg); }
-  body.tool-open .layout { grid-template-columns: 275px minmax(0, 1100px); }
-  body.tool-open .right, body.tool-open .search, body.tool-open #list { display: none; }
-  body.tool-open .frame { display: block; }
-  body.tool-open .back { display: grid; }
-
-  /* right column */
-  .right { padding: 12px 0 0 28px; }
-  .right-in { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 16px; }
-  .box { background: var(--card); border-radius: 16px; overflow: hidden; }
-  .box h2 { font-size: 17px; font-weight: 800; padding: 12px 16px; }
-  .box p { padding: 0 16px 12px; }
-  .box a.row { display: block; padding: 12px 16px; transition: background .15s; }
-  .box a.row:hover { background: var(--pill); }
-  .box a.row b { display: block; font-weight: 700; }
-  .box a.row span { color: var(--muted); font-size: 13px; }
-  .fine { color: var(--muted); font-size: 13px; padding: 0 16px; }
-  .fine a:hover { text-decoration: underline; }
+  .frame { display: block; width: 100%; height: calc(100vh - 53px); height: calc(100dvh - 53px); border: 0; background: var(--bg); }
 
   /* ── responsive: same steps X uses ── */
-  @media (max-width: 1280px) { .layout { grid-template-columns: 88px 600px; } .right { display: none; } body.tool-open .layout { grid-template-columns: 88px minmax(0, 1100px); } }
-  @media (max-width: 1000px) { .layout { grid-template-columns: 88px minmax(0, 600px); } }
   @media (max-width: 1280px) {
+    .layout { grid-template-columns: 88px minmax(0, 1100px); }
     .nav { align-items: center; }
-    .nav a { padding: 12px; }
+    .nav a { padding: 12px; width: auto; }
     .nav a .lb, .gh, .me div { display: none; }
     .logo, .me { margin-inline: auto; }
     .me { padding: 8px; }
   }
   @media (max-width: 700px) {
-    .layout, body.tool-open .layout { grid-template-columns: 1fr; }
-    .main { border-inline: 0; padding-bottom: 64px; }
+    .layout { grid-template-columns: 1fr; }
+    .main { border-inline: 0; padding-bottom: 56px; }
     .frame { height: calc(100vh - 53px - 56px); height: calc(100dvh - 53px - 56px); }
     .side {
       position: fixed; inset: auto 0 0 0; top: auto; height: 56px; z-index: 10; flex-direction: row; padding: 0 4px;
@@ -146,7 +99,7 @@
     }
     .logo, .me, .gh { display: none; }
     .nav { flex-direction: row; justify-content: space-around; width: 100%; margin: 0; }
-    .nav a { padding: 8px; }
+    .nav a { padding: 8px; width: auto; }
     .themes button { padding: 5px 8px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -166,80 +119,41 @@
     </a>
   </header>
 
-  <!-- center feed -->
+  <!-- center: the selected tool opens here -->
   <main class="main">
     <div class="head">
-      <div class="ttl"><a class="back" id="back" href="#" aria-label="Back to all tools">←</a><div><h1 id="title">Tools</h1><small id="count"></small></div></div>
+      <div><h1 id="title"></h1><small id="tag"></small></div>
       <div class="themes" role="group" aria-label="Theme">
         <button data-set="light" aria-pressed="false">Light</button>
         <button data-set="dim" aria-pressed="false">Dim</button>
         <button data-set="dark" aria-pressed="true">Dark</button>
       </div>
     </div>
-    <div class="search"><input id="q" type="search" placeholder="Search tools" autocomplete="off" aria-label="Search tools" /></div>
-    <div id="list"></div>
     <iframe class="frame" id="frame" title="Tool"></iframe>
   </main>
-
-  <!-- right column -->
-  <aside class="right">
-    <div class="right-in">
-      <section class="box">
-        <h2>About</h2>
-        <p>Internal tools for data processing, name formatting, email lookup, and reference code extraction. For everyday use.</p>
-        <a class="row" href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">
-          <b>data-utilities</b><span>View the code on GitHub</span>
-        </a>
-      </section>
-      <p class="fine">© 2026 Internal use only. Built with 💚</p>
-    </div>
-  </aside>
 
 </div>
 
 <script>
   // To add a tool, add one line here.
   const TOOLS = [
-    { icon: "📋", name: "For Summary Template", tag: "for process",   href: "summary-tool.html",
-      desc: "Fixes your file from INDEXONE so it becomes your SUMMARY TEMPLATE." },
-    { icon: "📬", name: "Email Lookup",         tag: "get email",     href: "email-lookup.html",
-      desc: "Paste the FINAL and copy the EMAIL ADDRESS." },
-    { icon: "📄", name: "Get Reference Code",   tag: "from DLX",      href: "reference-code.html",
-      desc: "Extracts the file from DLX and gets your correct REFERENCE CODE." },
-    { icon: "📆", name: "PIF NEW ENDO Mapper",  tag: "excel processor", href: "pif-new-endo-mapper.html",
-      desc: "Generates SUMMARY PIF HOMELOAN NEW ENDO from your PIF Excel file." },
-    { icon: "🔝", name: "For Passes",           tag: "excel processor", href: "for-passes.html",
-      desc: "Extracts data from the RESULT sheet, filters BANK = \"PIF HOME LOAN\", splits CANCEL rows, and creates a UNIQ sheet." }
+    { icon: "📋", name: "For Summary Template", tag: "for process",     href: "summary-tool.html" },
+    { icon: "📬", name: "Email Lookup",         tag: "get email",       href: "email-lookup.html" },
+    { icon: "📄", name: "Get Reference Code",   tag: "from DLX",        href: "reference-code.html" },
+    { icon: "📆", name: "PIF NEW ENDO Mapper",  tag: "excel processor", href: "pif-new-endo-mapper.html" },
+    { icon: "🔝", name: "For Passes",           tag: "excel processor", href: "for-passes.html" }
   ];
 
   const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const list = document.getElementById('list'), count = document.getElementById('count'), q = document.getElementById('q');
+  const slug = h => h.replace(/\.html$/, '');
+  const frame = document.getElementById('frame'), title = document.getElementById('title'), tag = document.getElementById('tag');
 
   // sidebar
-  const slug = h => h.replace(/\.html$/, '');
-  document.getElementById('nav').innerHTML =
-    `<a class="active" data-s="" href="#" title="All tools"><span class="ic">🏠</span><span class="lb">All tools</span></a>` +
-    TOOLS.map(t => `<a data-s="${esc(slug(t.href))}" href="#${esc(slug(t.href))}" title="${esc(t.name)}"><span class="ic">${t.icon}</span><span class="lb">${esc(t.name)}</span></a>`).join('');
-
-  // feed
-  function render() {
-    const term = q.value.trim().toLowerCase();
-    const hits = TOOLS.filter(t => (t.name + ' ' + t.tag + ' ' + t.desc).toLowerCase().includes(term));
-    count.textContent = hits.length + (hits.length === 1 ? ' tool' : ' tools');
-    list.innerHTML = hits.length ? hits.map(t => `
-      <a class="tool" href="#${esc(slug(t.href))}">
-        <div class="pic" aria-hidden="true">${t.icon}</div>
-        <div class="body">
-          <div class="top"><span class="name">${esc(t.name)}</span><span class="tag">@${esc(t.tag.replace(/\s+/g,'_'))}</span></div>
-          <p class="desc">${esc(t.desc)}</p>
-          <span class="open">Open tool</span>
-        </div>
-      </a>`).join('') : `<div class="empty"><b>No tools found</b>Try a different word.</div>`;
-  }
-  q.addEventListener('input', render);
+  document.getElementById('nav').innerHTML = TOOLS.map(t =>
+    `<a data-s="${esc(slug(t.href))}" href="#${esc(slug(t.href))}" title="${esc(t.name)}"><span class="ic">${t.icon}</span><span class="lb">${esc(t.name)}</span></a>`
+  ).join('');
 
   // theme: Light / Dim / Dark
-  const frame = document.getElementById('frame');
   const root = document.documentElement, btns = document.querySelectorAll('.themes button');
   function setTheme(t) {
     root.dataset.theme = t;
@@ -252,24 +166,15 @@
   setTheme(saved);
   btns.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.set)));
 
-  // open the chosen tool inside the center column
-  const title = document.getElementById('title');
+  // open the chosen tool in the center (the first one by default)
   function route() {
     const id = decodeURIComponent(location.hash.slice(1));
-    const t = TOOLS.find(x => slug(x.href) === id);
-    document.body.classList.toggle('tool-open', !!t);
-    document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('active', a.dataset.s === (t ? slug(t.href) : '')));
-    if (t) {
-      title.textContent = t.name;
-      count.textContent = t.tag;
-      document.title = t.name + ' · Jomayo Tools';
-      if (frame.dataset.src !== t.href) { frame.dataset.src = t.href; frame.src = t.href + '?theme=' + root.dataset.theme; }
-    } else {
-      title.textContent = 'Tools';
-      document.title = 'Jomayo Tools';
-      frame.removeAttribute('src'); delete frame.dataset.src;
-      render();
-    }
+    const t = TOOLS.find(x => slug(x.href) === id) || TOOLS[0];
+    document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('active', a.dataset.s === slug(t.href)));
+    title.textContent = t.name;
+    tag.textContent = t.tag;
+    document.title = t.name + ' · Jomayo Tools';
+    if (frame.dataset.src !== t.href) { frame.dataset.src = t.href; frame.src = t.href + '?theme=' + root.dataset.theme; }
   }
   addEventListener('hashchange', route);
   route();
