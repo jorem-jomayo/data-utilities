@@ -7,72 +7,76 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>" />
 <style>
   :root {
-    --bg: #000; --hover: #080808; --card: #16181c; --line: #2f3336;
+    --bg: #000; --hover: #080808; --pill: #181919; --card: #16181c; --line: #2f3336;
     --text: #e7e9ea; --muted: #71767b; --blue: #1d9bf0; --blue-h: #1a8cd8;
-    --blue-soft: rgba(29,155,240,.1); --banner: linear-gradient(135deg,#1d9bf0,#7856ff 55%,#f91880);
-    --nav-bg: rgba(0,0,0,.65);
+    --blue-soft: rgba(29,155,240,.12); --nav-bg: rgba(0,0,0,.65);
   }
   [data-theme="dim"] {
-    --bg: #15202b; --hover: #192734; --card: #1e2732; --line: #38444d;
+    --bg: #15202b; --hover: #192734; --pill: #1e2732; --card: #1e2732; --line: #38444d;
     --text: #f7f9f9; --muted: #8b98a5; --nav-bg: rgba(21,32,43,.75);
   }
   [data-theme="light"] {
-    --bg: #fff; --hover: #f7f9f9; --card: #f7f9f9; --line: #eff3f4;
+    --bg: #fff; --hover: #f7f9f9; --pill: #eff3f4; --card: #f7f9f9; --line: #eff3f4;
     --text: #0f1419; --muted: #536471; --nav-bg: rgba(255,255,255,.8);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
   body {
     background: var(--bg); color: var(--text);
     font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 15px; line-height: 1.33; transition: background .2s, color .2s;
-    -webkit-font-smoothing: antialiased;
+    font-size: 15px; line-height: 1.33; -webkit-font-smoothing: antialiased; transition: background .2s, color .2s;
   }
   a { color: inherit; text-decoration: none; }
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-  .shell { max-width: 600px; margin: 0 auto; min-height: 100vh; border-inline: 1px solid var(--line); }
+  /* ── three columns like X ── */
+  .layout { display: grid; grid-template-columns: 275px 600px 350px; justify-content: center; min-height: 100vh; }
 
-  /* top bar */
-  .bar {
-    position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 24px;
-    padding: 6px 16px; height: 53px; background: var(--nav-bg);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  /* left sidebar */
+  .side { position: sticky; top: 0; height: 100vh; padding: 0 12px; display: flex; flex-direction: column; }
+  .logo {
+    width: 52px; height: 52px; margin: 2px 0; border-radius: 50%; display: grid; place-items: center;
+    font-size: 28px; transition: background .15s;
   }
-  .bar h1 { font-size: 20px; font-weight: 800; }
-  .bar small { display: block; font-size: 13px; font-weight: 400; color: var(--muted); }
-  .bar .push { margin-left: auto; }
+  .logo:hover { background: var(--pill); }
+  .nav { display: flex; flex-direction: column; align-items: flex-start; margin-top: 2px; }
+  .nav a {
+    display: flex; align-items: center; gap: 20px; padding: 12px; border-radius: 999px;
+    font-size: 19px; transition: background .15s; max-width: 100%;
+  }
+  .nav a:hover { background: var(--pill); }
+  .nav a .ic { width: 28px; text-align: center; font-size: 24px; flex: none; }
+  .nav a .lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+  .nav a.active { font-weight: 800; }
+  .gh {
+    margin: 16px 0 0; width: 90%; text-align: center; background: var(--blue); color: #fff; font-weight: 700; font-size: 17px;
+    padding: 15px 0; border-radius: 999px; transition: background .15s;
+  }
+  .gh:hover { background: var(--blue-h); }
+  .me {
+    margin: auto 0 12px; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 999px; transition: background .15s;
+  }
+  .me:hover { background: var(--pill); }
+  .me .av { width: 40px; height: 40px; border-radius: 50%; background: var(--blue-soft); display: grid; place-items: center; font-size: 20px; flex: none; }
+  .me b { display: block; font-weight: 700; }
+  .me span { color: var(--muted); font-size: 14px; }
 
-  /* theme switch */
-  .themes { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+  /* center feed */
+  .main { border-inline: 1px solid var(--line); min-width: 0; }
+  .head {
+    position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 0 16px; height: 53px; background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .head h1 { font-size: 20px; font-weight: 800; line-height: 1.1; }
+  .head small { display: block; font-size: 13px; font-weight: 400; color: var(--muted); }
+  .themes { display: flex; gap: 2px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
   .themes button {
     border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700;
-    padding: 5px 12px; border-radius: 999px; cursor: pointer; transition: background .15s, color .15s;
+    padding: 5px 11px; border-radius: 999px; cursor: pointer; transition: background .15s, color .15s;
   }
   .themes button[aria-pressed="true"] { background: var(--blue); color: #fff; }
   .themes button:not([aria-pressed="true"]):hover { color: var(--text); }
 
-  /* profile header */
-  .banner { height: 150px; background: var(--banner); }
-  .profile { padding: 12px 16px 16px; border-bottom: 1px solid var(--line); }
-  .avatar {
-    width: 84px; height: 84px; border-radius: 50%; margin-top: -54px; display: grid; place-items: center;
-    font-size: 42px; background: var(--bg); border: 4px solid var(--bg); outline: 1px solid var(--line);
-  }
-  .profile h2 { font-size: 20px; font-weight: 800; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
-  .profile h2 svg { width: 20px; height: 20px; fill: var(--blue); }
-  .handle { color: var(--muted); }
-  .bio { margin-top: 12px; }
-  .meta { margin-top: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 16px; }
-  .meta a { color: var(--blue); }
-  .meta a:hover { text-decoration: underline; }
-  .stats { margin-top: 12px; display: flex; gap: 20px; color: var(--muted); }
-  .stats b { color: var(--text); font-weight: 700; }
-
-  /* tabs / search */
-  .tabs { display: flex; border-bottom: 1px solid var(--line); }
-  .tab { flex: 1; text-align: center; padding: 16px 0 0; font-weight: 700; color: var(--text); }
-  .tab span { display: inline-block; padding-bottom: 14px; border-bottom: 4px solid var(--blue); border-radius: 2px; }
   .search { padding: 10px 16px; border-bottom: 1px solid var(--line); }
   .search input {
     width: 100%; background: var(--card); border: 1px solid transparent; color: var(--text);
@@ -81,13 +85,9 @@
   .search input::placeholder { color: var(--muted); }
   .search input:focus { outline: 0; border-color: var(--blue); background: var(--bg); }
 
-  /* tool rows, styled as posts */
   .tool { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); transition: background .15s; }
   .tool:hover { background: var(--hover); }
-  .tool .pic {
-    flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--blue-soft);
-    display: grid; place-items: center; font-size: 20px;
-  }
+  .tool .pic { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--blue-soft); display: grid; place-items: center; font-size: 20px; }
   .tool .body { min-width: 0; flex: 1; }
   .tool .top { display: flex; flex-wrap: wrap; gap: 0 6px; align-items: baseline; }
   .tool .name { font-weight: 700; }
@@ -95,60 +95,94 @@
   .tool:hover .name { text-decoration: underline; }
   .tool .desc { margin-top: 2px; overflow-wrap: anywhere; }
   .tool .open {
-    margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px;
-    color: var(--blue); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px;
-    transition: background .15s, border-color .15s;
+    margin-top: 10px; display: inline-flex; font-weight: 700; font-size: 14px; color: var(--blue);
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; transition: background .15s, border-color .15s, color .15s;
   }
   .tool:hover .open { background: var(--blue); border-color: var(--blue); color: #fff; }
-
   .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
   .empty b { display: block; color: var(--text); font-size: 20px; margin-bottom: 4px; }
 
-  footer { padding: 24px 16px 48px; color: var(--muted); font-size: 13px; text-align: center; }
-  footer a { color: var(--blue); }
-  footer a:hover { text-decoration: underline; }
+  /* right column */
+  .right { padding: 12px 0 0 28px; }
+  .right-in { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 16px; }
+  .box { background: var(--card); border-radius: 16px; overflow: hidden; }
+  .box h2 { font-size: 20px; font-weight: 800; padding: 12px 16px; }
+  .box p { padding: 0 16px 12px; }
+  .box a.row { display: block; padding: 12px 16px; transition: background .15s; }
+  .box a.row:hover { background: var(--pill); }
+  .box a.row b { display: block; font-weight: 700; }
+  .box a.row span { color: var(--muted); font-size: 13px; }
+  .fine { color: var(--muted); font-size: 13px; padding: 0 16px; }
+  .fine a:hover { text-decoration: underline; }
 
-  @media (max-width: 600px) { .shell { border-inline: 0; } }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+  /* ── responsive: same steps X uses ── */
+  @media (max-width: 1280px) { .layout { grid-template-columns: 88px 600px; } .right { display: none; } }
+  @media (max-width: 1000px) { .layout { grid-template-columns: 88px minmax(0, 600px); } }
+  @media (max-width: 1280px) {
+    .nav { align-items: center; }
+    .nav a { padding: 12px; }
+    .nav a .lb, .gh, .me div { display: none; }
+    .logo, .me { margin-inline: auto; }
+    .me { padding: 8px; }
+  }
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .main { border-inline: 0; padding-bottom: 64px; }
+    .side {
+      position: fixed; inset: auto 0 0 0; top: auto; height: 56px; z-index: 10; flex-direction: row; padding: 0 4px;
+      background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line);
+      padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: content-box;
+    }
+    .logo, .me, .gh { display: none; }
+    .nav { flex-direction: row; justify-content: space-around; width: 100%; margin: 0; }
+    .nav a { padding: 8px; }
+    .themes button { padding: 5px 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<div class="shell">
+<div class="layout">
 
-  <div class="bar">
-    <div>
-      <h1>Tools</h1>
-      <small id="count"></small>
+  <!-- left sidebar: the tools -->
+  <header class="side">
+    <a class="logo" href="./" aria-label="Home">⭐</a>
+    <nav class="nav" id="nav" aria-label="Tools"></nav>
+    <a class="gh" href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">GitHub</a>
+    <a class="me" href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">
+      <div class="av" aria-hidden="true">🧰</div>
+      <div><b>Jomayo</b><span>@data-utilities</span></div>
+    </a>
+  </header>
+
+  <!-- center feed -->
+  <main class="main">
+    <div class="head">
+      <div><h1>Tools</h1><small id="count"></small></div>
+      <div class="themes" role="group" aria-label="Theme">
+        <button data-set="light" aria-pressed="false">Light</button>
+        <button data-set="dim" aria-pressed="false">Dim</button>
+        <button data-set="dark" aria-pressed="true">Dark</button>
+      </div>
     </div>
-    <div class="themes push" role="group" aria-label="Theme">
-      <button data-set="light" aria-pressed="false">Light</button>
-      <button data-set="dim" aria-pressed="false">Dim</button>
-      <button data-set="dark" aria-pressed="true">Dark</button>
+    <div class="search"><input id="q" type="search" placeholder="Search tools" autocomplete="off" aria-label="Search tools" /></div>
+    <div id="list"></div>
+  </main>
+
+  <!-- right column -->
+  <aside class="right">
+    <div class="right-in">
+      <section class="box">
+        <h2>About</h2>
+        <p>Internal tools for data processing, name formatting, email lookup, and reference code extraction. For everyday use.</p>
+        <a class="row" href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">
+          <b>data-utilities</b><span>View the code on GitHub</span>
+        </a>
+      </section>
+      <p class="fine">© 2026 Internal use only. Built with 💚</p>
     </div>
-  </div>
+  </aside>
 
-  <div class="banner" aria-hidden="true"></div>
-  <section class="profile">
-    <div class="avatar" aria-hidden="true">⭐</div>
-    <h2>Jomayo
-      <svg viewBox="0 0 24 24" aria-label="Verified"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91C2.88 9.33 2 10.57 2 12s.88 2.67 2.19 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
-    </h2>
-    <div class="handle">@data-utilities</div>
-    <p class="bio">Internal tools for data processing, name formatting, email lookup, and reference code extraction. For everyday use.</p>
-    <div class="meta">
-      <span>🧰 Internal use only</span>
-      <a href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">github.com/data-utilities</a>
-    </div>
-  </section>
-
-  <nav class="tabs"><div class="tab"><span>All tools</span></div></nav>
-  <div class="search">
-    <input id="q" type="search" placeholder="Search tools" autocomplete="off" aria-label="Search tools" />
-  </div>
-
-  <main id="list"></main>
-
-  <footer>© 2026 Internal use only. Built with 💚 · <a href="https://github.com/joremacerado1999-lgtm/data-utilities" target="_blank" rel="noopener">GitHub</a></footer>
 </div>
 
 <script>
@@ -170,11 +204,15 @@
       desc: "Extracts data from the RESULT sheet, filters BANK = \"PIF HOME LOAN\", splits CANCEL rows, and creates a UNIQ sheet." }
   ];
 
-  const list = document.getElementById('list');
-  const count = document.getElementById('count');
-  const q = document.getElementById('q');
   const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const list = document.getElementById('list'), count = document.getElementById('count'), q = document.getElementById('q');
 
+  // sidebar
+  document.getElementById('nav').innerHTML =
+    `<a class="active" href="./" title="All tools"><span class="ic">🏠</span><span class="lb">All tools</span></a>` +
+    TOOLS.map(t => `<a href="${esc(t.href)}" title="${esc(t.name)}"><span class="ic">${t.icon}</span><span class="lb">${esc(t.name)}</span></a>`).join('');
+
+  // feed
   function render() {
     const term = q.value.trim().toLowerCase();
     const hits = TOOLS.filter(t => (t.name + ' ' + t.tag + ' ' + t.desc).toLowerCase().includes(term));
@@ -192,9 +230,8 @@
   q.addEventListener('input', render);
   render();
 
-  // theme: Light / Dim / Dark (like X)
-  const root = document.documentElement;
-  const btns = document.querySelectorAll('.themes button');
+  // theme: Light / Dim / Dark
+  const root = document.documentElement, btns = document.querySelectorAll('.themes button');
   function setTheme(t) {
     root.dataset.theme = t;
     btns.forEach(b => b.setAttribute('aria-pressed', b.dataset.set === t));
